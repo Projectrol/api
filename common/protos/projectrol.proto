@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option go_package = "github.com/lehoangvuvt/projectrol/common/protos";
+
+package protos;
+
+service UsersService {
+    rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
+}
+
+message CreateUserRequest{ 
+    string email = 1;
+    string password = 2;
+}
+
+message CreateUserResponse{ 
+    bool success = 1;
+    string message = 2;
+}
+
+service WorkspacesService {
+    rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
+}
+
+message CreateWorkspaceRequest{ 
+    string name = 1;
+    string slug = 2;
+    string nanoid = 3;
+    int32 owner_id = 4;
+}
+
+message CreateWorkspaceResponse{ 
+    bool success = 1;
+    string message = 2;
+}
+
