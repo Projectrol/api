@@ -1,35 +1,45 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 
-	"github.com/lehoangvuvt/projectrol/common"
+	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
 	"github.com/lehoangvuvt/projectrol/users/models"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 )
 
-var (
-	GRPC_PORT = 3000
-)
-
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", GRPC_PORT))
+	dbUsername := common.GetEnvValByKey("DB_USERNAME", "postgres")
+	dbPassword := common.GetEnvValByKey("DB_PASSWORD", "admin")
+	dbHost := common.GetEnvValByKey("DB_HOST", "localhost")
+	dbName := common.GetEnvValByKey("DB_NAME", "postgres")
+	portStr := common.GetEnvValByKey("DB_PORT", "5432")
+	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		log.Fatal("Cannot start gRPC server. Error: " + err.Error())
+		port = 5432
+	}
+	connectionStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", dbUsername, dbPassword, dbHost, port, dbName)
+	db, err := common.ConnectToDatabase(context.Background(), "postgres", connectionStr)
+	if err != nil {
+		log.Fatalf("Cannot connect to database. Error: " + err.Error())
+	}
+	lis, err := net.Listen("tcp", "localhost:3000")
+	if err != nil {
+		log.Fatalf("Cannot listen TCP on address %s", "localhost:3000")
 	}
 	grpcServer := grpc.NewServer()
-	db, err := common.ConnectToDB()
-	if err != nil {
-		log.Fatal("Cannot connect to database. Error: " + err.Error())
+	server := &server{
+		UserModel: models.NewUserModel(db),
 	}
-	server := &server{models: models.NewModels(db)}
 	pb.RegisterUsersServiceServer(grpcServer, server)
-	log.Printf("Starting users gRPC server at: %d", lis.Addr())
-	err = grpcServer.Serve(lis)
-	if err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	log.Printf("Start gRPC server on address %s", "localhost:3000")
+	if err = grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Cannot server gGRPC on port address %s", "localhost:3000")
 	}
 }

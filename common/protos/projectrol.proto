@@ -1,36 +1,62 @@
 syntax = "proto3";
-
 option go_package = "github.com/lehoangvuvt/projectrol/common/protos";
-
 package protos;
 
-service UsersService {
-    rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
+message CreateUserRequest {
+ string email = 1;
+ string password = 2;
 }
 
-message CreateUserRequest{ 
+message CreateUserResponse {
+    int32 id = 1;
+}
+
+message LoginRequest {
     string email = 1;
     string password = 2;
 }
 
-message CreateUserResponse{ 
-    bool success = 1;
-    string message = 2;
+message User {
+    int32 id = 1;
+    string email = 2;
+}
+
+message Workspace {
+    int32 id = 1;
+    string nanoid = 2;
+    string name = 3;
+    string slug = 4;
+}
+
+message CreateWorkspaceRequest {
+    string name = 1;
+    int32 ownerId = 2;
+}
+
+message CreateWorkspaceResponse {
+    string nanoid = 1;
+}
+
+message GetWorkspacesByUserIdRequest {
+    int32 userId = 1;
+}
+
+message GetWorkspacesByUserIdResponse {
+    repeated Workspace workspaces = 1;
+}
+
+message GetUserByIdRequest {
+    int32 userId = 1;   
+}
+
+service UsersService {
+    rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
+    rpc Login(LoginRequest) returns(User);
+    rpc GetUserById(GetUserByIdRequest) returns(User);
 }
 
 service WorkspacesService {
     rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
-}
-
-message CreateWorkspaceRequest{ 
-    string name = 1;
-    string slug = 2;
-    string nanoid = 3;
-    int32 owner_id = 4;
-}
-
-message CreateWorkspaceResponse{ 
-    bool success = 1;
-    string message = 2;
+    rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
 }
 

@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS workspaces (
     id serial primary key,
-    nanoid text UNIQUE NOT NULL,
-    slug text UNIQUE NOT NULL,
-    name text UNIQUE NOT NULL,
+    nanoid text NOT NULL UNIQUE,
+    name text NOT NULL UNIQUE,
+    slug text NOT NULL UNIQUE,
     owner_id serial NOT NULL,
-    created_at timestamp default (now() at time zone 'utc'),
+    created_at timestamp DEFAULT (NOW() at time zone 'utc'),
     updated_at timestamp,
     FOREIGN KEY (owner_id) REFERENCES users(id)
 )

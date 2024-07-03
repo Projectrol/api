@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UsersService_CreateUser_FullMethodName = "/protos.UsersService/CreateUser"
+	UsersService_CreateUser_FullMethodName  = "/protos.UsersService/CreateUser"
+	UsersService_Login_FullMethodName       = "/protos.UsersService/Login"
+	UsersService_GetUserById_FullMethodName = "/protos.UsersService/GetUserById"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -27,6 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*User, error)
+	GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*User, error)
 }
 
 type usersServiceClient struct {
@@ -46,11 +50,31 @@ func (c *usersServiceClient) CreateUser(ctx context.Context, in *CreateUserReque
 	return out, nil
 }
 
+func (c *usersServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, UsersService_Login_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, UsersService_GetUserById_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServiceServer is the server API for UsersService service.
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
 type UsersServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	Login(context.Context, *LoginRequest) (*User, error)
+	GetUserById(context.Context, *GetUserByIdRequest) (*User, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }
 
@@ -60,6 +84,12 @@ type UnimplementedUsersServiceServer struct {
 
 func (UnimplementedUsersServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedUsersServiceServer) Login(context.Context, *LoginRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUsersServiceServer) GetUserById(context.Context, *GetUserByIdRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
 func (UnimplementedUsersServiceServer) mustEmbedUnimplementedUsersServiceServer() {}
 
@@ -92,6 +122,42 @@ func _UsersService_CreateUser_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).GetUserById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_GetUserById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).GetUserById(ctx, req.(*GetUserByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UsersService_ServiceDesc is the grpc.ServiceDesc for UsersService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -103,13 +169,22 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "CreateUser",
 			Handler:    _UsersService_CreateUser_Handler,
 		},
+		{
+			MethodName: "Login",
+			Handler:    _UsersService_Login_Handler,
+		},
+		{
+			MethodName: "GetUserById",
+			Handler:    _UsersService_GetUserById_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "protos/projectrol.proto",
 }
 
 const (
-	WorkspacesService_CreateWorkspace_FullMethodName = "/protos.WorkspacesService/CreateWorkspace"
+	WorkspacesService_CreateWorkspace_FullMethodName       = "/protos.WorkspacesService/CreateWorkspace"
+	WorkspacesService_GetWorkspacesByUserId_FullMethodName = "/protos.WorkspacesService/GetWorkspacesByUserId"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -117,6 +192,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WorkspacesServiceClient interface {
 	CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error)
+	GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -136,11 +212,21 @@ func (c *workspacesServiceClient) CreateWorkspace(ctx context.Context, in *Creat
 	return out, nil
 }
 
+func (c *workspacesServiceClient) GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error) {
+	out := new(GetWorkspacesByUserIdResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetWorkspacesByUserId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
 type WorkspacesServiceServer interface {
 	CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error)
+	GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -150,6 +236,9 @@ type UnimplementedWorkspacesServiceServer struct {
 
 func (UnimplementedWorkspacesServiceServer) CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkspace not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspacesByUserId not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -182,6 +271,24 @@ func _WorkspacesService_CreateWorkspace_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_GetWorkspacesByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkspacesByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetWorkspacesByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetWorkspacesByUserId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetWorkspacesByUserId(ctx, req.(*GetWorkspacesByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -192,6 +299,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateWorkspace",
 			Handler:    _WorkspacesService_CreateWorkspace_Handler,
+		},
+		{
+			MethodName: "GetWorkspacesByUserId",
+			Handler:    _WorkspacesService_GetWorkspacesByUserId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
