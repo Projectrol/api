@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
+	"strings"
 
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
 	"golang.org/x/crypto/bcrypt"
@@ -46,6 +48,12 @@ func (m *UserModel) Insert(ctx context.Context, input *pb.CreateUserRequest) (*p
 	if err != nil {
 		return &pb.CreateUserResponse{Id: -1}, errors.New("somthing error")
 	}
+	name := strings.Split(input.Email, "@")[0]
+	_, err = m.DB.Exec("INSERT INTO users_settings(user_id, name, theme, avatar, phone_no) VALUES($1, $2, $3, $4, $5)",
+		id, name, "LIGHT", "", "")
+	if err != nil {
+		log.Print("Insert user settings error. Error: " + err.Error())
+	}
 	return &pb.CreateUserResponse{Id: id}, nil
 }
 
@@ -60,21 +68,38 @@ func (m *UserModel) Login(ctx context.Context, input *pb.LoginRequest) (*pb.User
 	if err != nil {
 		return nil, errors.New("password incorrect")
 	}
-	return &pb.User{
-		Id:    int32(user.Id),
-		Email: user.Email,
-	}, nil
+	return m.GetUserById(ctx, &pb.GetUserByIdRequest{UserId: int32(user.Id)})
 }
 
 func (m *UserModel) GetUserById(ctx context.Context, input *pb.GetUserByIdRequest) (*pb.User, error) {
-	user := &User{}
+	user := &pb.User{}
 	row := m.DB.QueryRow("SELECT id, email FROM users WHERE id=$1", input.UserId)
 	err := row.Scan(&user.Id, &user.Email)
 	if err != nil {
 		return nil, errors.New("user id not found")
 	}
-	return &pb.User{
-		Id:    int32(user.Id),
-		Email: user.Email,
-	}, nil
+
+	userSettings := &pb.UserSettings{}
+
+	err = m.DB.QueryRow("SELECT user_id, name, avatar, theme, phone_no FROM users_settings WHERE user_id=$1", user.Id).
+		Scan(&userSettings.Id, &userSettings.Name, &userSettings.Avatar, &userSettings.Theme, &userSettings.PhoneNo)
+
+	if err == nil {
+		user.Settings = userSettings
+	} else {
+		log.Print(err)
+	}
+
+	return user, nil
+}
+
+func (m *UserModel) UpdateUserSettings(ctx context.Context, in *pb.UserSettings) (*pb.UserSettings, error) {
+	_, err := m.DB.Exec(`UPDATE users_settings 
+				SET name = $1, avatar = $2, theme = $3, phone_no = $4 
+				WHERE user_id = $5`, in.Name, in.Avatar, in.Theme, in.PhoneNo, in.Id,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return in, nil
 }

@@ -23,3 +23,7 @@ func (s *server) CreateWorkspace(ctx context.Context, in *pb.CreateWorkspaceRequ
 		Nanoid: nanoid,
 	}, nil
 }
+
+func (s *server) GetWorkspacesByUserId(ctx context.Context, in *pb.GetWorkspacesByUserIdRequest) (*pb.GetWorkspacesByUserIdResponse, error) {
+	return s.WorkspaceModel.GetWorkspacesByUserId(ctx, in.UserId)
+}

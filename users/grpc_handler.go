@@ -23,3 +23,7 @@ func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.User, erro
 func (s *server) GetUserById(ctx context.Context, in *pb.GetUserByIdRequest) (*pb.User, error) {
 	return s.UserModel.GetUserById(ctx, in)
 }
+
+func (s *server) UpdateUserSettings(ctx context.Context, in *pb.UserSettings) (*pb.UserSettings, error) {
+	return s.UserModel.UpdateUserSettings(ctx, in)
+}

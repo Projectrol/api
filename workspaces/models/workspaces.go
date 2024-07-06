@@ -19,6 +19,19 @@ type Workspace struct {
 	UpdatedAt sql.NullString `json:"updated_at"`
 }
 
+type WorkspaceSettings struct {
+	Id          int            `json:"id"`
+	WorkspaceId int            `json:"workspace_id"`
+	Logo        string         `json:"logo"`
+	CreatedAt   string         `json:"created_at"`
+	UpdatedAt   sql.NullString `json:"updated_at"`
+}
+
+type CreateWorkspaceInput struct {
+	Name string `json:"name"`
+	Logo string `json:"logo"`
+}
+
 type WorkspaceModel struct {
 	DB *sql.DB
 }
@@ -32,6 +45,7 @@ func (m *WorkspaceModel) Insert(ctx context.Context, input *pb.CreateWorkspaceRe
 	nanoid := common.GenerateNanoid()
 	name := input.Name
 	ownerId := input.OwnerId
+	logo := input.Logo
 	var existedName string
 	row := m.DB.QueryRow("SELECT name FROM workspaces WHERE name=$1", name)
 	err := row.Scan(&existedName)
@@ -43,10 +57,37 @@ func (m *WorkspaceModel) Insert(ctx context.Context, input *pb.CreateWorkspaceRe
 		return "", err
 	}
 	var id int
-	row = m.DB.QueryRow("SELECT id FROM workspaces WHERE nanoid=$1", nanoid)
-	err = row.Scan(&id)
+	err = m.DB.QueryRow("SELECT id from workspaces WHERE nanoid=$1", nanoid).Scan(&id)
 	if err != nil {
-		return "", errors.New("something error")
+		return "", err
 	}
+
+	_, err = m.DB.Exec("INSERT INTO workspaces_settings(workspace_id, logo) VALUES($1, $2)", id, logo)
+
+	if err != nil {
+		return "", err
+	}
+
 	return nanoid, nil
+}
+
+func (m *WorkspaceModel) GetWorkspacesByUserId(ctx context.Context, userId int32) (*pb.GetWorkspacesByUserIdResponse, error) {
+	rows, err := m.DB.Query("SELECT id, nanoid, name, slug FROM workspaces WHERE owner_id=$1", userId)
+	if err != nil {
+		return &pb.GetWorkspacesByUserIdResponse{Workspaces: make([]*pb.Workspace, 0)}, err
+	}
+	var workspaces []*pb.Workspace
+	for rows.Next() {
+		w := &pb.Workspace{}
+		err = rows.Scan(&w.Id, &w.Nanoid, &w.Name, &w.Slug)
+		if err == nil {
+			ws := &pb.WorkspaceSettings{}
+			err = m.DB.QueryRow("SELECT logo FROM workspaces_settings WHERE workspace_id=$1", w.Id).Scan(&ws.Logo)
+			if err == nil {
+				w.Settings = ws
+			}
+			workspaces = append(workspaces, w)
+		}
+	}
+	return &pb.GetWorkspacesByUserIdResponse{Workspaces: workspaces}, nil
 }

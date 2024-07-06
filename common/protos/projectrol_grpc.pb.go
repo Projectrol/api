@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UsersService_CreateUser_FullMethodName  = "/protos.UsersService/CreateUser"
-	UsersService_Login_FullMethodName       = "/protos.UsersService/Login"
-	UsersService_GetUserById_FullMethodName = "/protos.UsersService/GetUserById"
+	UsersService_CreateUser_FullMethodName         = "/protos.UsersService/CreateUser"
+	UsersService_Login_FullMethodName              = "/protos.UsersService/Login"
+	UsersService_GetUserById_FullMethodName        = "/protos.UsersService/GetUserById"
+	UsersService_UpdateUserSettings_FullMethodName = "/protos.UsersService/UpdateUserSettings"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -31,6 +32,7 @@ type UsersServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*User, error)
 	GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*User, error)
+	UpdateUserSettings(ctx context.Context, in *UserSettings, opts ...grpc.CallOption) (*UserSettings, error)
 }
 
 type usersServiceClient struct {
@@ -68,6 +70,15 @@ func (c *usersServiceClient) GetUserById(ctx context.Context, in *GetUserByIdReq
 	return out, nil
 }
 
+func (c *usersServiceClient) UpdateUserSettings(ctx context.Context, in *UserSettings, opts ...grpc.CallOption) (*UserSettings, error) {
+	out := new(UserSettings)
+	err := c.cc.Invoke(ctx, UsersService_UpdateUserSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServiceServer is the server API for UsersService service.
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type UsersServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	Login(context.Context, *LoginRequest) (*User, error)
 	GetUserById(context.Context, *GetUserByIdRequest) (*User, error)
+	UpdateUserSettings(context.Context, *UserSettings) (*UserSettings, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedUsersServiceServer) Login(context.Context, *LoginRequest) (*U
 }
 func (UnimplementedUsersServiceServer) GetUserById(context.Context, *GetUserByIdRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
+}
+func (UnimplementedUsersServiceServer) UpdateUserSettings(context.Context, *UserSettings) (*UserSettings, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSettings not implemented")
 }
 func (UnimplementedUsersServiceServer) mustEmbedUnimplementedUsersServiceServer() {}
 
@@ -158,6 +173,24 @@ func _UsersService_GetUserById_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersService_UpdateUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSettings)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).UpdateUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_UpdateUserSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).UpdateUserSettings(ctx, req.(*UserSettings))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UsersService_ServiceDesc is the grpc.ServiceDesc for UsersService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserById",
 			Handler:    _UsersService_GetUserById_Handler,
+		},
+		{
+			MethodName: "UpdateUserSettings",
+			Handler:    _UsersService_UpdateUserSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -303,6 +340,223 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkspacesByUserId",
 			Handler:    _WorkspacesService_GetWorkspacesByUserId_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protos/projectrol.proto",
+}
+
+const (
+	TasksService_CreateTask_FullMethodName = "/protos.TasksService/CreateTask"
+)
+
+// TasksServiceClient is the client API for TasksService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type TasksServiceClient interface {
+	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
+}
+
+type tasksServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewTasksServiceClient(cc grpc.ClientConnInterface) TasksServiceClient {
+	return &tasksServiceClient{cc}
+}
+
+func (c *tasksServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
+	out := new(CreateTaskResponse)
+	err := c.cc.Invoke(ctx, TasksService_CreateTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TasksServiceServer is the server API for TasksService service.
+// All implementations must embed UnimplementedTasksServiceServer
+// for forward compatibility
+type TasksServiceServer interface {
+	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
+	mustEmbedUnimplementedTasksServiceServer()
+}
+
+// UnimplementedTasksServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedTasksServiceServer struct {
+}
+
+func (UnimplementedTasksServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
+}
+func (UnimplementedTasksServiceServer) mustEmbedUnimplementedTasksServiceServer() {}
+
+// UnsafeTasksServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TasksServiceServer will
+// result in compilation errors.
+type UnsafeTasksServiceServer interface {
+	mustEmbedUnimplementedTasksServiceServer()
+}
+
+func RegisterTasksServiceServer(s grpc.ServiceRegistrar, srv TasksServiceServer) {
+	s.RegisterService(&TasksService_ServiceDesc, srv)
+}
+
+func _TasksService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksServiceServer).CreateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TasksService_CreateTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// TasksService_ServiceDesc is the grpc.ServiceDesc for TasksService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var TasksService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "protos.TasksService",
+	HandlerType: (*TasksServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateTask",
+			Handler:    _TasksService_CreateTask_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protos/projectrol.proto",
+}
+
+const (
+	ProjectsService_CreateProject_FullMethodName            = "/protos.ProjectsService/CreateProject"
+	ProjectsService_GetProjectsByWorkspaceId_FullMethodName = "/protos.ProjectsService/GetProjectsByWorkspaceId"
+)
+
+// ProjectsServiceClient is the client API for ProjectsService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ProjectsServiceClient interface {
+	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
+	GetProjectsByWorkspaceId(ctx context.Context, in *GetProjectsByWorkspaceIdRequest, opts ...grpc.CallOption) (*GetProjectsByWorkspaceIdResponse, error)
+}
+
+type projectsServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewProjectsServiceClient(cc grpc.ClientConnInterface) ProjectsServiceClient {
+	return &projectsServiceClient{cc}
+}
+
+func (c *projectsServiceClient) CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error) {
+	out := new(CreateProjectResponse)
+	err := c.cc.Invoke(ctx, ProjectsService_CreateProject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *projectsServiceClient) GetProjectsByWorkspaceId(ctx context.Context, in *GetProjectsByWorkspaceIdRequest, opts ...grpc.CallOption) (*GetProjectsByWorkspaceIdResponse, error) {
+	out := new(GetProjectsByWorkspaceIdResponse)
+	err := c.cc.Invoke(ctx, ProjectsService_GetProjectsByWorkspaceId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ProjectsServiceServer is the server API for ProjectsService service.
+// All implementations must embed UnimplementedProjectsServiceServer
+// for forward compatibility
+type ProjectsServiceServer interface {
+	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
+	GetProjectsByWorkspaceId(context.Context, *GetProjectsByWorkspaceIdRequest) (*GetProjectsByWorkspaceIdResponse, error)
+	mustEmbedUnimplementedProjectsServiceServer()
+}
+
+// UnimplementedProjectsServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedProjectsServiceServer struct {
+}
+
+func (UnimplementedProjectsServiceServer) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
+}
+func (UnimplementedProjectsServiceServer) GetProjectsByWorkspaceId(context.Context, *GetProjectsByWorkspaceIdRequest) (*GetProjectsByWorkspaceIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProjectsByWorkspaceId not implemented")
+}
+func (UnimplementedProjectsServiceServer) mustEmbedUnimplementedProjectsServiceServer() {}
+
+// UnsafeProjectsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ProjectsServiceServer will
+// result in compilation errors.
+type UnsafeProjectsServiceServer interface {
+	mustEmbedUnimplementedProjectsServiceServer()
+}
+
+func RegisterProjectsServiceServer(s grpc.ServiceRegistrar, srv ProjectsServiceServer) {
+	s.RegisterService(&ProjectsService_ServiceDesc, srv)
+}
+
+func _ProjectsService_CreateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProjectsServiceServer).CreateProject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProjectsService_CreateProject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProjectsServiceServer).CreateProject(ctx, req.(*CreateProjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProjectsService_GetProjectsByWorkspaceId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProjectsByWorkspaceIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProjectsServiceServer).GetProjectsByWorkspaceId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProjectsService_GetProjectsByWorkspaceId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProjectsServiceServer).GetProjectsByWorkspaceId(ctx, req.(*GetProjectsByWorkspaceIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ProjectsService_ServiceDesc is the grpc.ServiceDesc for ProjectsService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ProjectsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "protos.ProjectsService",
+	HandlerType: (*ProjectsServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateProject",
+			Handler:    _ProjectsService_CreateProject_Handler,
+		},
+		{
+			MethodName: "GetProjectsByWorkspaceId",
+			Handler:    _ProjectsService_GetProjectsByWorkspaceId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

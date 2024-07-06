@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 option go_package = "github.com/lehoangvuvt/projectrol/common/protos";
 package protos;
 
@@ -16,9 +17,18 @@ message LoginRequest {
     string password = 2;
 }
 
+message UserSettings {
+    int32 id = 1;
+    string name = 2;
+    string avatar = 3;
+    string theme = 4;
+    string phone_no = 5;
+}
+
 message User {
     int32 id = 1;
     string email = 2;
+    UserSettings settings = 3;
 }
 
 message Workspace {
@@ -26,11 +36,17 @@ message Workspace {
     string nanoid = 2;
     string name = 3;
     string slug = 4;
+    WorkspaceSettings settings = 5;
+}
+
+message WorkspaceSettings {
+    string logo = 1;
 }
 
 message CreateWorkspaceRequest {
     string name = 1;
     int32 ownerId = 2;
+    string logo = 3;
 }
 
 message CreateWorkspaceResponse {
@@ -49,10 +65,75 @@ message GetUserByIdRequest {
     int32 userId = 1;   
 }
 
+message CreateTaskRequest {
+    string title = 1;
+	string description = 2;
+	int32 duration = 3;
+	int64 dtstart = 4;
+    string type = 5;
+    optional RecurringConfig recurring = 6;   
+    int32 createdBy = 7;
+    int32 workspaceId = 8;
+}
+
+message CreateTaskResponse{
+    int32 id = 1;
+}
+
+message RecurringConfig {
+    string type = 1;
+    int32 count = 2;
+    int32 interval = 3; 
+    optional ByWeekDayRule byweekdayRule = 4;
+}
+
+message ByWeekDayRule {
+	int32 day = 1;
+	int32 every = 2;
+}
+
+message Project {
+    int32 id = 1;
+    int32 workspace_id = 2;
+    int32 created_by = 3;
+    string name = 4;
+    string slug = 5;
+    string summary = 6;
+    string description = 7;
+    string dtstart = 8;
+    string dtend = 9;
+    string created_at = 10;
+}
+
+message CreateProjectRequest {
+	int32 workspace_id = 1;
+    int32 created_by = 2;
+    string name = 3;
+    string summary = 4;
+    string description = 5;
+	int64 dtstart = 6;
+    int64 dtend = 7;
+}
+
+message CreateProjectResponse {
+    int32 id = 1;
+}
+
+message GetProjectsByWorkspaceIdRequest {
+    int32 workspace_id = 1;
+    int32 user_id = 2;
+}
+
+message GetProjectsByWorkspaceIdResponse {
+    repeated Project projects = 1;
+}
+
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
     rpc GetUserById(GetUserByIdRequest) returns(User);
+    rpc UpdateUserSettings(UserSettings) returns(UserSettings);
 }
 
 service WorkspacesService {
@@ -60,3 +141,11 @@ service WorkspacesService {
     rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
 }
 
+service TasksService {
+    rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
+}
+
+service ProjectsService {
+    rpc CreateProject(CreateProjectRequest) returns(CreateProjectResponse);
+    rpc GetProjectsByWorkspaceId(GetProjectsByWorkspaceIdRequest) returns(GetProjectsByWorkspaceIdResponse);
+}
