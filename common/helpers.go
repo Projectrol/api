@@ -64,8 +64,8 @@ func ConnectToDatabase(ctx context.Context, driverName string, connectionStr str
 	return db, nil
 }
 
-func GenerateNanoid() string {
-	nanoid, _ := gonanoid.Generate("abcdefghijklmnopqrstuvwxyz1234567890", 10)
+func GenerateNanoid(length int) string {
+	nanoid, _ := gonanoid.Generate("abcdefghijklmnopqrstuvwxyz1234567890", length)
 	return nanoid
 }
 

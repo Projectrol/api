@@ -28,6 +28,7 @@ func (app *application) getRoutes() *http.Handler {
 	router.HandlerFunc(http.MethodPost, "/api/tasks/create", app.AuthGuard(app.CreateTaskHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/projects/create", app.AuthGuard(app.CreateProjectHandler))
+	router.HandlerFunc(http.MethodGet, "/api/projects/:workspaceSlug/:projectSlug", app.AuthGuard(app.GetProjectDetails))
 
 	handler := crs.Handler(router)
 	return &handler

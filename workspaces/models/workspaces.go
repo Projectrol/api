@@ -42,7 +42,7 @@ func NewWorkspaceModel(DB *sql.DB) *WorkspaceModel {
 
 func (m *WorkspaceModel) Insert(ctx context.Context, input *pb.CreateWorkspaceRequest) (string, error) {
 	slug := common.GenerateSlugName(input.Name)
-	nanoid := common.GenerateNanoid()
+	nanoid := common.GenerateNanoid(10)
 	name := input.Name
 	ownerId := input.OwnerId
 	logo := input.Logo

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,8 +9,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
-	pModels "github.com/lehoangvuvt/projectrol/projects/models"
-	taskModels "github.com/lehoangvuvt/projectrol/tasks/models"
 	wsModels "github.com/lehoangvuvt/projectrol/workspaces/models"
 
 	"google.golang.org/grpc"
@@ -21,7 +18,9 @@ import (
 func (app *application) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := grpc.NewClient("localhost:3000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to users gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to users gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
 	client := pb.NewUsersServiceClient(conn)
 	request := &pb.CreateUserRequest{}
@@ -48,7 +47,9 @@ func (app *application) AuthenticateHandler(w http.ResponseWriter, r *http.Reque
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	conn, err := grpc.NewClient("localhost:3000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to users gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to users gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
 	client := pb.NewUsersServiceClient(conn)
 	request := &pb.GetUserByIdRequest{UserId: int32(userId)}
@@ -64,7 +65,9 @@ func (app *application) AuthenticateHandler(w http.ResponseWriter, r *http.Reque
 func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := grpc.NewClient("localhost:3000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to users gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to users gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
 	client := pb.NewUsersServiceClient(conn)
 	request := &pb.LoginRequest{}
@@ -100,7 +103,9 @@ func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 func (app *application) CreateWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to workspaces gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
 	client := pb.NewWorkspacesServiceClient(conn)
 	body := &wsModels.CreateWorkspaceInput{}
@@ -146,12 +151,14 @@ func (app *application) GetWorkspacesByUserId(w http.ResponseWriter, r *http.Req
 }
 
 func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := grpc.NewClient("localhost:3002", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to workspaces gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
-	client := pb.NewTasksServiceClient(conn)
-	body := &taskModels.CreateTaskInput{}
+	client := pb.NewWorkspacesServiceClient(conn)
+	body := &wsModels.CreateTaskInput{}
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	err = common.ReadJSON(r, body)
 
@@ -199,7 +206,9 @@ func (app *application) UpdateUserSettingsHandler(w http.ResponseWriter, r *http
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	conn, err := grpc.NewClient("localhost:3000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to users gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to users gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
 	client := pb.NewUsersServiceClient(conn)
 	request := &pb.UserSettings{}
@@ -220,12 +229,14 @@ func (app *application) UpdateUserSettingsHandler(w http.ResponseWriter, r *http
 }
 
 func (app *application) CreateProjectHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := grpc.NewClient("localhost:3003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Cannot connect to projects gRPC server. Error: " + err.Error())
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
 	}
-	client := pb.NewProjectsServiceClient(conn)
-	body := &pModels.CreateProjectInput{}
+	client := pb.NewWorkspacesServiceClient(conn)
+	body := &wsModels.CreateProjectInput{}
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	err = common.ReadJSON(r, body)
 
@@ -263,13 +274,13 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 		common.WriteJSON(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	conn, err := grpc.NewClient("localhost:3003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		errMsg := common.Envelop{"error": "Cannot connect to projects gRPC server. Error: " + err.Error()}
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
 		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
 		return
 	}
-	client := pb.NewProjectsServiceClient(conn)
+	client := pb.NewWorkspacesServiceClient(conn)
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	request := &pb.GetProjectsByWorkspaceIdRequest{
 		WorkspaceId: int32(workspaceId),
@@ -284,4 +295,30 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 		return
 	}
 	common.WriteJSON(w, http.StatusCreated, common.Envelop{"projects": res.Projects})
+}
+
+func (app *application) GetProjectDetails(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	workspaceSlug := params.ByName("workspaceSlug")
+	projectSlug := params.ByName("projectSlug")
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewWorkspacesServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+	request := &pb.GetProjectDetailsRequest{
+		WorkspaceSlug: workspaceSlug,
+		ProjectSlug:   projectSlug,
+		UserId:        int32(userId),
+	}
+	response, err := client.GetProjectDetails(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"project": response.Project})
 }

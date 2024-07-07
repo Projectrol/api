@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lehoangvuvt/projectrol/common"
+	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
 )
 
@@ -77,7 +77,7 @@ func NewTaskModel(DB *sql.DB) *TaskModel {
 
 func (m *TaskModel) Insert(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	var taskId int
-	nanoid := common.GenerateNanoid()
+	nanoid := common.GenerateNanoid(10)
 	err := m.DB.QueryRow("INSERT INTO tasks(nanoid, title, description, duration, type, workspace_id, created_by) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
 		nanoid,
 		in.Title,

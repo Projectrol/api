@@ -36,6 +36,8 @@ func main() {
 	grpcServer := grpc.NewServer()
 	server := &server{
 		WorkspaceModel: models.NewWorkspaceModel(db),
+		TaskModel:      models.NewTaskModel(db),
+		ProjectModel:   models.NewProjectsModel(db),
 	}
 	pb.RegisterWorkspacesServiceServer(grpcServer, server)
 	log.Printf("Start gRPC server on address %s", "localhost:3001")

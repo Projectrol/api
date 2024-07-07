@@ -31,7 +31,7 @@ func NewProjectsModel(DB *sql.DB) *ProjectsModel {
 }
 
 func (m *ProjectsModel) CreateProject(ctx context.Context, in *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {
-	slug := common.GenerateSlugName(in.Name)
+	slug := common.GenerateSlugName(in.Name) + "-" + common.GenerateNanoid(8)
 	dtstart, _ := strconv.ParseInt(fmt.Sprintf("%d", in.Dtstart), 10, 64)
 	dtstartTime := time.Unix(dtstart, 0).UTC()
 	dtEnd, _ := strconv.ParseInt(fmt.Sprintf("%d", in.Dtend), 10, 64)
@@ -73,4 +73,17 @@ func (m *ProjectsModel) GetProjectsByWorkspaceId(ctx context.Context, in *pb.Get
 	}
 
 	return &pb.GetProjectsByWorkspaceIdResponse{Projects: projects}, nil
+}
+
+func (m *ProjectsModel) GetProjectDetails(ctx context.Context, in *pb.GetProjectDetailsRequest) (*pb.GetProjectDetailsResponse, error) {
+	project := &pb.Project{}
+	err := m.DB.QueryRow(`SELECT id, workspace_id, created_by, name, slug, summary, description, dtstart, dtend, created_at 
+					FROM projects WHERE slug = $1`, in.ProjectSlug).
+		Scan(&project.Id, &project.WorkspaceId, &project.CreatedBy,
+			&project.Name, &project.Slug, &project.Summary,
+			&project.Description, &project.Dtstart, &project.Dtend, &project.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetProjectDetailsResponse{Project: project}, nil
 }

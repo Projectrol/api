@@ -128,6 +128,15 @@ message GetProjectsByWorkspaceIdResponse {
     repeated Project projects = 1;
 }
 
+message GetProjectDetailsRequest {
+    string workspace_slug = 1;
+    string project_slug = 2;
+    int32 user_id = 3;
+}
+
+message GetProjectDetailsResponse {
+    Project project = 1;
+}
 
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
@@ -139,13 +148,8 @@ service UsersService {
 service WorkspacesService {
     rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
     rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
-}
-
-service TasksService {
     rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
-}
-
-service ProjectsService {
     rpc CreateProject(CreateProjectRequest) returns(CreateProjectResponse);
     rpc GetProjectsByWorkspaceId(GetProjectsByWorkspaceIdRequest) returns(GetProjectsByWorkspaceIdResponse);
+    rpc GetProjectDetails(GetProjectDetailsRequest) returns(GetProjectDetailsResponse);
 }
