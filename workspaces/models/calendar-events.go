@@ -23,26 +23,26 @@ const (
 	YEARLY   RecurringType = "YEARLY"
 )
 
-type TaskType string
+type EventType string
 
 const (
-	MEETING TaskType = "MEETING"
+	MEETING EventType = "MEETING"
 )
 
-type Task struct {
+type CalendarEvent struct {
 	Id          int            `json:"id"`
 	NanoId      string         `json:"nanoid"`
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
 	Duration    int            `json:"duration"` //in seconds
-	Type        TaskType       `json:"type"`
+	Type        EventType      `json:"type"`
 	WorkspaceId int            `json:"workspace_id"`
 	CreatedBy   int            `json:"created_by"`
 	CreatedAt   string         `json:"created_at"`
 	UpdatedAt   sql.NullString `json:"updated_at"`
 }
 
-type CreateTaskInput struct {
+type CreateEventInput struct {
 	Title       string              `json:"title"`
 	Description string              `json:"description"`
 	Duration    int                 `json:"duration"`
@@ -52,33 +52,33 @@ type CreateTaskInput struct {
 	WorkspaceId int                 `json:"workspace_id"`
 }
 
-type TaskInstance struct {
-	Id           int            `json:"id"`
-	TaskEntityId int            `json:"task_entity_id"`
-	DtStart      string         `json:"dtstart"`
-	CreatedAt    string         `json:"created_at"`
-	UpdatedAt    sql.NullString `json:"updated_at"`
+type EventInstance struct {
+	Id            int            `json:"id"`
+	EventEntityId int            `json:"event_entity_id"`
+	DtStart       string         `json:"dtstart"`
+	CreatedAt     string         `json:"created_at"`
+	UpdatedAt     sql.NullString `json:"updated_at"`
 }
 
-type CreateTaskInstanceInput struct {
-	TaskEntityId int    `json:"task_entity_id"`
-	DtStart      string `json:"dt_start"`
+type CreateEventInstanceInput struct {
+	EventEntityId int    `json:"event_entity_id"`
+	DtStart       string `json:"dt_start"`
 }
 
-type TaskModel struct {
+type CalendarEventModel struct {
 	DB *sql.DB
 }
 
-func NewTaskModel(DB *sql.DB) *TaskModel {
-	return &TaskModel{
+func NewCalendarEventModel(DB *sql.DB) *CalendarEventModel {
+	return &CalendarEventModel{
 		DB: DB,
 	}
 }
 
-func (m *TaskModel) Insert(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
-	var taskId int
+func (m *CalendarEventModel) Insert(ctx context.Context, in *pb.CreateCalendarEventRequest) (*pb.CreateCalendarEventResponse, error) {
+	var eventId int
 	nanoid := common.GenerateNanoid(10)
-	err := m.DB.QueryRow("INSERT INTO tasks(nanoid, title, description, duration, type, workspace_id, created_by) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+	err := m.DB.QueryRow("INSERT INTO calendar_events(nanoid, title, description, duration, type, workspace_id, created_by) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
 		nanoid,
 		in.Title,
 		in.Description,
@@ -86,17 +86,17 @@ func (m *TaskModel) Insert(ctx context.Context, in *pb.CreateTaskRequest) (*pb.C
 		in.Type,
 		in.WorkspaceId,
 		in.CreatedBy,
-	).Scan(&taskId)
+	).Scan(&eventId)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if in.Recurring != nil {
-		inputs := ProcessRecurring(in, taskId)
+		inputs := ProcessRecurring(in, eventId)
 		for _, input := range inputs {
-			m.DB.Exec("INSERT INTO task_instances(task_entity_id, dtstart) VALUES($1, $2)",
-				input.TaskEntityId,
+			m.DB.Exec("INSERT INTO calendar_event_instances(event_entity_id, dtstart) VALUES($1, $2)",
+				input.EventEntityId,
 				input.DtStart)
 		}
 	}
@@ -118,10 +118,10 @@ func GetDateOfNthDay(year int, monthIndex int, dayOfWeekIndex int, n int) (time.
 	return time.Date(year, time.Month(month), nthDay, 0, 0, 0, 0, time.UTC), nil
 }
 
-func ProcessRecurring(input *pb.CreateTaskRequest, taskId int) []CreateTaskInstanceInput {
+func ProcessRecurring(input *pb.CreateCalendarEventRequest, eventId int) []CreateEventInstanceInput {
 	recurring := input.Recurring
 	if recurring == nil {
-		return make([]CreateTaskInstanceInput, 0)
+		return make([]CreateEventInstanceInput, 0)
 	}
 	dtstartTS := input.Dtstart
 	dtstart := time.Unix(dtstartTS, 0).UTC().String()
@@ -132,9 +132,9 @@ func ProcessRecurring(input *pb.CreateTaskRequest, taskId int) []CreateTaskInsta
 	rType := recurring.Type
 	byweekdayRule := recurring.ByweekdayRule
 	currentDT := startDT
-	var inputs []CreateTaskInstanceInput
+	var inputs []CreateEventInstanceInput
 	if rType != "WEEKLY" && byweekdayRule != nil {
-		inputs = append(inputs, CreateTaskInstanceInput{TaskEntityId: taskId, DtStart: dtstart})
+		inputs = append(inputs, CreateEventInstanceInput{EventEntityId: eventId, DtStart: dtstart})
 		if rType == "MONTHLY" {
 			layout := "2006-01-02 15:04:05 -0700 MST"
 			formattedDTStart, _ := time.Parse(layout, dtstart)
@@ -152,15 +152,15 @@ func ProcessRecurring(input *pb.CreateTaskRequest, taskId int) []CreateTaskInsta
 					formattedDTStart.Hour(),
 					formattedDTStart.Minute(), 0, 0, time.UTC)
 
-				inputs = append(inputs, CreateTaskInstanceInput{TaskEntityId: taskId, DtStart: foundedDate.UTC().String()})
+				inputs = append(inputs, CreateEventInstanceInput{EventEntityId: eventId, DtStart: foundedDate.UTC().String()})
 				month = month + interval
 			}
 		}
 	} else {
 		for i := 0; i < count; i++ {
-			inputs = append(inputs, CreateTaskInstanceInput{
-				DtStart:      currentDT.UTC().String(),
-				TaskEntityId: taskId,
+			inputs = append(inputs, CreateEventInstanceInput{
+				DtStart:       currentDT.UTC().String(),
+				EventEntityId: eventId,
 			})
 			// currentDT = currentDT.add(interval, intervalType)
 		}

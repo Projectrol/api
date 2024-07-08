@@ -1,0 +1,1 @@
+DELETE TABLE IF EXISTS user_notifications_settings;

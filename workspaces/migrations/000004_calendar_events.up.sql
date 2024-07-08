@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE IF NOT EXISTS calendar_events (
     id serial primary key,
     nanoid text NOT NULL UNIQUE,
     title text NOT NULL,

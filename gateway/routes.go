@@ -25,10 +25,13 @@ func (app *application) getRoutes() *http.Handler {
 	router.HandlerFunc(http.MethodPost, "/api/workspaces/create", app.AuthGuard(app.CreateWorkspaceHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.GetProjectsByWorkspaceIdHandler))
 
-	router.HandlerFunc(http.MethodPost, "/api/tasks/create", app.AuthGuard(app.CreateTaskHandler))
+	router.HandlerFunc(http.MethodPost, "/api/calendar-events/create", app.AuthGuard(app.CreateCalendarEventHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/projects/create", app.AuthGuard(app.CreateProjectHandler))
-	router.HandlerFunc(http.MethodGet, "/api/projects/:workspaceSlug/:projectSlug", app.AuthGuard(app.GetProjectDetails))
+	router.HandlerFunc(http.MethodGet, "/api/projects/:workspaceSlug/:projectSlug", app.AuthGuard(app.GetProjectDetailsHandler))
+
+	router.HandlerFunc(http.MethodGet, "/api/notifications/user-settings", app.AuthGuard(app.GetUserNotificationsSettingsHandler))
+	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))
 
 	handler := crs.Handler(router)
 	return &handler

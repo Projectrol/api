@@ -9,9 +9,9 @@ import (
 
 type server struct {
 	pb.UnimplementedWorkspacesServiceServer
-	WorkspaceModel *models.WorkspaceModel
-	TaskModel      *models.TaskModel
-	ProjectModel   *models.ProjectsModel
+	WorkspaceModel     *models.WorkspaceModel
+	CalendarEventModel *models.CalendarEventModel
+	ProjectModel       *models.ProjectsModel
 }
 
 func (s *server) CreateWorkspace(ctx context.Context, in *pb.CreateWorkspaceRequest) (*pb.CreateWorkspaceResponse, error) {
@@ -30,8 +30,8 @@ func (s *server) GetWorkspacesByUserId(ctx context.Context, in *pb.GetWorkspaces
 	return s.WorkspaceModel.GetWorkspacesByUserId(ctx, in.UserId)
 }
 
-func (s *server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
-	return s.TaskModel.Insert(ctx, in)
+func (s *server) CreateTask(ctx context.Context, in *pb.CreateCalendarEventRequest) (*pb.CreateCalendarEventResponse, error) {
+	return s.CalendarEventModel.Insert(ctx, in)
 }
 
 func (s *server) CreateProject(ctx context.Context, in *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {

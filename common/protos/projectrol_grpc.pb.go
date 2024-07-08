@@ -222,7 +222,7 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 const (
 	WorkspacesService_CreateWorkspace_FullMethodName          = "/protos.WorkspacesService/CreateWorkspace"
 	WorkspacesService_GetWorkspacesByUserId_FullMethodName    = "/protos.WorkspacesService/GetWorkspacesByUserId"
-	WorkspacesService_CreateTask_FullMethodName               = "/protos.WorkspacesService/CreateTask"
+	WorkspacesService_CreateCalendarEvent_FullMethodName      = "/protos.WorkspacesService/CreateCalendarEvent"
 	WorkspacesService_CreateProject_FullMethodName            = "/protos.WorkspacesService/CreateProject"
 	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
 	WorkspacesService_GetProjectDetails_FullMethodName        = "/protos.WorkspacesService/GetProjectDetails"
@@ -234,7 +234,7 @@ const (
 type WorkspacesServiceClient interface {
 	CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error)
-	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
+	CreateCalendarEvent(ctx context.Context, in *CreateCalendarEventRequest, opts ...grpc.CallOption) (*CreateCalendarEventResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
 	GetProjectsByWorkspaceId(ctx context.Context, in *GetProjectsByWorkspaceIdRequest, opts ...grpc.CallOption) (*GetProjectsByWorkspaceIdResponse, error)
 	GetProjectDetails(ctx context.Context, in *GetProjectDetailsRequest, opts ...grpc.CallOption) (*GetProjectDetailsResponse, error)
@@ -266,9 +266,9 @@ func (c *workspacesServiceClient) GetWorkspacesByUserId(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *workspacesServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
-	out := new(CreateTaskResponse)
-	err := c.cc.Invoke(ctx, WorkspacesService_CreateTask_FullMethodName, in, out, opts...)
+func (c *workspacesServiceClient) CreateCalendarEvent(ctx context.Context, in *CreateCalendarEventRequest, opts ...grpc.CallOption) (*CreateCalendarEventResponse, error) {
+	out := new(CreateCalendarEventResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_CreateCalendarEvent_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +308,7 @@ func (c *workspacesServiceClient) GetProjectDetails(ctx context.Context, in *Get
 type WorkspacesServiceServer interface {
 	CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error)
-	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
+	CreateCalendarEvent(context.Context, *CreateCalendarEventRequest) (*CreateCalendarEventResponse, error)
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
 	GetProjectsByWorkspaceId(context.Context, *GetProjectsByWorkspaceIdRequest) (*GetProjectsByWorkspaceIdResponse, error)
 	GetProjectDetails(context.Context, *GetProjectDetailsRequest) (*GetProjectDetailsResponse, error)
@@ -325,8 +325,8 @@ func (UnimplementedWorkspacesServiceServer) CreateWorkspace(context.Context, *Cr
 func (UnimplementedWorkspacesServiceServer) GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspacesByUserId not implemented")
 }
-func (UnimplementedWorkspacesServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
+func (UnimplementedWorkspacesServiceServer) CreateCalendarEvent(context.Context, *CreateCalendarEventRequest) (*CreateCalendarEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCalendarEvent not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
@@ -386,20 +386,20 @@ func _WorkspacesService_GetWorkspacesByUserId_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _WorkspacesService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateTaskRequest)
+func _WorkspacesService_CreateCalendarEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCalendarEventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WorkspacesServiceServer).CreateTask(ctx, in)
+		return srv.(WorkspacesServiceServer).CreateCalendarEvent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: WorkspacesService_CreateTask_FullMethodName,
+		FullMethod: WorkspacesService_CreateCalendarEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkspacesServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
+		return srv.(WorkspacesServiceServer).CreateCalendarEvent(ctx, req.(*CreateCalendarEventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -474,8 +474,8 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _WorkspacesService_GetWorkspacesByUserId_Handler,
 		},
 		{
-			MethodName: "CreateTask",
-			Handler:    _WorkspacesService_CreateTask_Handler,
+			MethodName: "CreateCalendarEvent",
+			Handler:    _WorkspacesService_CreateCalendarEvent_Handler,
 		},
 		{
 			MethodName: "CreateProject",
@@ -488,6 +488,170 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProjectDetails",
 			Handler:    _WorkspacesService_GetProjectDetails_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protos/projectrol.proto",
+}
+
+const (
+	NotificationsService_CreateUserNotificationsSettings_FullMethodName = "/protos.NotificationsService/CreateUserNotificationsSettings"
+	NotificationsService_UpdateUserNotificationsSettings_FullMethodName = "/protos.NotificationsService/UpdateUserNotificationsSettings"
+	NotificationsService_GetUserNotificationsSettings_FullMethodName    = "/protos.NotificationsService/GetUserNotificationsSettings"
+)
+
+// NotificationsServiceClient is the client API for NotificationsService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type NotificationsServiceClient interface {
+	CreateUserNotificationsSettings(ctx context.Context, in *UpsertUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*UpsertUserNotificationsSettingsResponse, error)
+	UpdateUserNotificationsSettings(ctx context.Context, in *UpsertUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*UpsertUserNotificationsSettingsResponse, error)
+	GetUserNotificationsSettings(ctx context.Context, in *GetUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*GetUserNotificationsSettingsResponse, error)
+}
+
+type notificationsServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewNotificationsServiceClient(cc grpc.ClientConnInterface) NotificationsServiceClient {
+	return &notificationsServiceClient{cc}
+}
+
+func (c *notificationsServiceClient) CreateUserNotificationsSettings(ctx context.Context, in *UpsertUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*UpsertUserNotificationsSettingsResponse, error) {
+	out := new(UpsertUserNotificationsSettingsResponse)
+	err := c.cc.Invoke(ctx, NotificationsService_CreateUserNotificationsSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationsServiceClient) UpdateUserNotificationsSettings(ctx context.Context, in *UpsertUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*UpsertUserNotificationsSettingsResponse, error) {
+	out := new(UpsertUserNotificationsSettingsResponse)
+	err := c.cc.Invoke(ctx, NotificationsService_UpdateUserNotificationsSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationsServiceClient) GetUserNotificationsSettings(ctx context.Context, in *GetUserNotificationsSettingsRequest, opts ...grpc.CallOption) (*GetUserNotificationsSettingsResponse, error) {
+	out := new(GetUserNotificationsSettingsResponse)
+	err := c.cc.Invoke(ctx, NotificationsService_GetUserNotificationsSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// NotificationsServiceServer is the server API for NotificationsService service.
+// All implementations must embed UnimplementedNotificationsServiceServer
+// for forward compatibility
+type NotificationsServiceServer interface {
+	CreateUserNotificationsSettings(context.Context, *UpsertUserNotificationsSettingsRequest) (*UpsertUserNotificationsSettingsResponse, error)
+	UpdateUserNotificationsSettings(context.Context, *UpsertUserNotificationsSettingsRequest) (*UpsertUserNotificationsSettingsResponse, error)
+	GetUserNotificationsSettings(context.Context, *GetUserNotificationsSettingsRequest) (*GetUserNotificationsSettingsResponse, error)
+	mustEmbedUnimplementedNotificationsServiceServer()
+}
+
+// UnimplementedNotificationsServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedNotificationsServiceServer struct {
+}
+
+func (UnimplementedNotificationsServiceServer) CreateUserNotificationsSettings(context.Context, *UpsertUserNotificationsSettingsRequest) (*UpsertUserNotificationsSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserNotificationsSettings not implemented")
+}
+func (UnimplementedNotificationsServiceServer) UpdateUserNotificationsSettings(context.Context, *UpsertUserNotificationsSettingsRequest) (*UpsertUserNotificationsSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserNotificationsSettings not implemented")
+}
+func (UnimplementedNotificationsServiceServer) GetUserNotificationsSettings(context.Context, *GetUserNotificationsSettingsRequest) (*GetUserNotificationsSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserNotificationsSettings not implemented")
+}
+func (UnimplementedNotificationsServiceServer) mustEmbedUnimplementedNotificationsServiceServer() {}
+
+// UnsafeNotificationsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to NotificationsServiceServer will
+// result in compilation errors.
+type UnsafeNotificationsServiceServer interface {
+	mustEmbedUnimplementedNotificationsServiceServer()
+}
+
+func RegisterNotificationsServiceServer(s grpc.ServiceRegistrar, srv NotificationsServiceServer) {
+	s.RegisterService(&NotificationsService_ServiceDesc, srv)
+}
+
+func _NotificationsService_CreateUserNotificationsSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertUserNotificationsSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationsServiceServer).CreateUserNotificationsSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationsService_CreateUserNotificationsSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationsServiceServer).CreateUserNotificationsSettings(ctx, req.(*UpsertUserNotificationsSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationsService_UpdateUserNotificationsSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertUserNotificationsSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationsServiceServer).UpdateUserNotificationsSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationsService_UpdateUserNotificationsSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationsServiceServer).UpdateUserNotificationsSettings(ctx, req.(*UpsertUserNotificationsSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationsService_GetUserNotificationsSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserNotificationsSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationsServiceServer).GetUserNotificationsSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationsService_GetUserNotificationsSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationsServiceServer).GetUserNotificationsSettings(ctx, req.(*GetUserNotificationsSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// NotificationsService_ServiceDesc is the grpc.ServiceDesc for NotificationsService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var NotificationsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "protos.NotificationsService",
+	HandlerType: (*NotificationsServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateUserNotificationsSettings",
+			Handler:    _NotificationsService_CreateUserNotificationsSettings_Handler,
+		},
+		{
+			MethodName: "UpdateUserNotificationsSettings",
+			Handler:    _NotificationsService_UpdateUserNotificationsSettings_Handler,
+		},
+		{
+			MethodName: "GetUserNotificationsSettings",
+			Handler:    _NotificationsService_GetUserNotificationsSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

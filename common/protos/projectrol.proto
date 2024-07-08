@@ -65,7 +65,7 @@ message GetUserByIdRequest {
     int32 userId = 1;   
 }
 
-message CreateTaskRequest {
+message CreateCalendarEventRequest {
     string title = 1;
 	string description = 2;
 	int32 duration = 3;
@@ -76,7 +76,7 @@ message CreateTaskRequest {
     int32 workspaceId = 8;
 }
 
-message CreateTaskResponse{
+message CreateCalendarEventResponse{
     int32 id = 1;
 }
 
@@ -138,6 +138,32 @@ message GetProjectDetailsResponse {
     Project project = 1;
 }
 
+message UserNotificationsSettings {
+    int32 user_id = 1;
+    bool is_via_inbox = 2;
+    bool is_via_email = 3;
+    string task_noti_settings = 4;
+    string project_noti_settings = 5;
+    string event_noti_settings = 6;
+    int32 event_notice_before = 7;
+}
+
+message UpsertUserNotificationsSettingsRequest {
+    UserNotificationsSettings settings = 1;
+}
+
+message UpsertUserNotificationsSettingsResponse {
+    UserNotificationsSettings settings = 1;
+}
+
+message GetUserNotificationsSettingsRequest {
+    int32 userId = 1;
+}
+
+message GetUserNotificationsSettingsResponse {
+    UserNotificationsSettings settings = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -148,8 +174,14 @@ service UsersService {
 service WorkspacesService {
     rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
     rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
-    rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
+    rpc CreateCalendarEvent(CreateCalendarEventRequest) returns(CreateCalendarEventResponse);
     rpc CreateProject(CreateProjectRequest) returns(CreateProjectResponse);
     rpc GetProjectsByWorkspaceId(GetProjectsByWorkspaceIdRequest) returns(GetProjectsByWorkspaceIdResponse);
     rpc GetProjectDetails(GetProjectDetailsRequest) returns(GetProjectDetailsResponse);
+}
+
+service NotificationsService {  
+    rpc CreateUserNotificationsSettings(UpsertUserNotificationsSettingsRequest) returns(UpsertUserNotificationsSettingsResponse);
+    rpc UpdateUserNotificationsSettings(UpsertUserNotificationsSettingsRequest) returns(UpsertUserNotificationsSettingsResponse);
+    rpc GetUserNotificationsSettings(GetUserNotificationsSettingsRequest) returns(GetUserNotificationsSettingsResponse);
 }

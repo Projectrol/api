@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
+	notiModels "github.com/lehoangvuvt/projectrol/notifications/models"
 	wsModels "github.com/lehoangvuvt/projectrol/workspaces/models"
 
 	"google.golang.org/grpc"
@@ -150,7 +151,7 @@ func (app *application) GetWorkspacesByUserId(w http.ResponseWriter, r *http.Req
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"workspaces": response.Workspaces})
 }
 
-func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) CreateCalendarEventHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
@@ -158,7 +159,7 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	client := pb.NewWorkspacesServiceClient(conn)
-	body := &wsModels.CreateTaskInput{}
+	body := &wsModels.CreateEventInput{}
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	err = common.ReadJSON(r, body)
 
@@ -167,7 +168,7 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 		common.WriteJSON(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	request := &pb.CreateTaskRequest{
+	request := &pb.CreateCalendarEventRequest{
 		Title:       body.Title,
 		Description: body.Description,
 		Duration:    int32(body.Duration),
@@ -179,7 +180,7 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	ctx := context.Background()
-	res, err := client.CreateTask(ctx, request)
+	res, err := client.CreateCalendarEvent(ctx, request)
 	if err != nil {
 		errMsg := common.Envelop{"error": err.Error()}
 		common.WriteJSON(w, http.StatusBadRequest, errMsg)
@@ -297,7 +298,7 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 	common.WriteJSON(w, http.StatusCreated, common.Envelop{"projects": res.Projects})
 }
 
-func (app *application) GetProjectDetails(w http.ResponseWriter, r *http.Request) {
+func (app *application) GetProjectDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	workspaceSlug := params.ByName("workspaceSlug")
 	projectSlug := params.ByName("projectSlug")
@@ -321,4 +322,61 @@ func (app *application) GetProjectDetails(w http.ResponseWriter, r *http.Request
 		return
 	}
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"project": response.Project})
+}
+
+func (app *application) GetUserNotificationsSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3002", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to notifications gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewNotificationsServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+	request := &pb.GetUserNotificationsSettingsRequest{
+		UserId: int32(userId),
+	}
+	response, err := client.GetUserNotificationsSettings(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"settings": response.Settings})
+}
+
+func (app *application) UpdateUserNotificationsSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3002", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to notifications gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewNotificationsServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+	bodyData := &notiModels.UpsertUserNotiSettingsInput{}
+	err = common.ReadJSON(r, bodyData)
+	if err != nil {
+		errMsg := common.Envelop{"error": "Invalid body request data. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	request := &pb.UpsertUserNotificationsSettingsRequest{
+		Settings: &pb.UserNotificationsSettings{
+			UserId:              int32(userId),
+			IsViaInbox:          bodyData.IsViaInbox,
+			IsViaEmail:          bodyData.IsViaEmail,
+			TaskNotiSettings:    bodyData.TaskNotiSettings,
+			ProjectNotiSettings: bodyData.ProjectNotiSettings,
+			EventNotiSettings:   bodyData.EventNotiSettings,
+			EventNoticeBefore:   int32(bodyData.EventNoticeBefore),
+		},
+	}
+	response, err := client.UpdateUserNotificationsSettings(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"settings": response.Settings})
 }

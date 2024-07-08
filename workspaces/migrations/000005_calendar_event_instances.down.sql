@@ -1,0 +1,1 @@
+DELETE TABLE IF EXISTS calendar_event_instances;
