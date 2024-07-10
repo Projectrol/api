@@ -24,6 +24,8 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/api/workspaces/create", app.AuthGuard(app.CreateWorkspaceHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.GetProjectsByWorkspaceIdHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id", app.AuthGuard(app.GetWorkspaceDetailsHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspace-roles/:id", app.AuthGuard(app.GetWorkspaceRolesHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/calendar-events/create", app.AuthGuard(app.CreateCalendarEventHandler))
 
@@ -32,6 +34,9 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/api/notifications/user-settings", app.AuthGuard(app.GetUserNotificationsSettingsHandler))
 	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))
+
+	router.HandlerFunc(http.MethodGet, "/api/permissions", app.GetPermissionsHandler)
+	router.HandlerFunc(http.MethodPatch, "/api/permissions", app.AuthGuard(app.UpdateRolePermissionHandler))
 
 	handler := crs.Handler(router)
 	return &handler

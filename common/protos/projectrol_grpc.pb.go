@@ -222,10 +222,15 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 const (
 	WorkspacesService_CreateWorkspace_FullMethodName          = "/protos.WorkspacesService/CreateWorkspace"
 	WorkspacesService_GetWorkspacesByUserId_FullMethodName    = "/protos.WorkspacesService/GetWorkspacesByUserId"
+	WorkspacesService_GetWorkspaceDetails_FullMethodName      = "/protos.WorkspacesService/GetWorkspaceDetails"
+	WorkspacesService_GetWorkspaceRoles_FullMethodName        = "/protos.WorkspacesService/GetWorkspaceRoles"
 	WorkspacesService_CreateCalendarEvent_FullMethodName      = "/protos.WorkspacesService/CreateCalendarEvent"
 	WorkspacesService_CreateProject_FullMethodName            = "/protos.WorkspacesService/CreateProject"
 	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
 	WorkspacesService_GetProjectDetails_FullMethodName        = "/protos.WorkspacesService/GetProjectDetails"
+	WorkspacesService_GetPermissions_FullMethodName           = "/protos.WorkspacesService/GetPermissions"
+	WorkspacesService_UpdateRolePermission_FullMethodName     = "/protos.WorkspacesService/UpdateRolePermission"
+	WorkspacesService_GetUserRoleInWorkspace_FullMethodName   = "/protos.WorkspacesService/GetUserRoleInWorkspace"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -234,10 +239,15 @@ const (
 type WorkspacesServiceClient interface {
 	CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error)
+	GetWorkspaceDetails(ctx context.Context, in *GetWorkspaceDetailsRequest, opts ...grpc.CallOption) (*GetWorkspaceDetailsResponse, error)
+	GetWorkspaceRoles(ctx context.Context, in *GetWorkspaceRolesRequest, opts ...grpc.CallOption) (*GetWorkspaceRolesResponse, error)
 	CreateCalendarEvent(ctx context.Context, in *CreateCalendarEventRequest, opts ...grpc.CallOption) (*CreateCalendarEventResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
 	GetProjectsByWorkspaceId(ctx context.Context, in *GetProjectsByWorkspaceIdRequest, opts ...grpc.CallOption) (*GetProjectsByWorkspaceIdResponse, error)
 	GetProjectDetails(ctx context.Context, in *GetProjectDetailsRequest, opts ...grpc.CallOption) (*GetProjectDetailsResponse, error)
+	GetPermissions(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPermissionsResponse, error)
+	UpdateRolePermission(ctx context.Context, in *UpdateRolePermissionRequest, opts ...grpc.CallOption) (*UpdateRolePermissionResponse, error)
+	GetUserRoleInWorkspace(ctx context.Context, in *GetUserRoleInWorkspaceRequest, opts ...grpc.CallOption) (*GetUserRoleInWorkspaceResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -260,6 +270,24 @@ func (c *workspacesServiceClient) CreateWorkspace(ctx context.Context, in *Creat
 func (c *workspacesServiceClient) GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error) {
 	out := new(GetWorkspacesByUserIdResponse)
 	err := c.cc.Invoke(ctx, WorkspacesService_GetWorkspacesByUserId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetWorkspaceDetails(ctx context.Context, in *GetWorkspaceDetailsRequest, opts ...grpc.CallOption) (*GetWorkspaceDetailsResponse, error) {
+	out := new(GetWorkspaceDetailsResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetWorkspaceDetails_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetWorkspaceRoles(ctx context.Context, in *GetWorkspaceRolesRequest, opts ...grpc.CallOption) (*GetWorkspaceRolesResponse, error) {
+	out := new(GetWorkspaceRolesResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetWorkspaceRoles_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -302,16 +330,48 @@ func (c *workspacesServiceClient) GetProjectDetails(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *workspacesServiceClient) GetPermissions(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPermissionsResponse, error) {
+	out := new(GetPermissionsResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetPermissions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) UpdateRolePermission(ctx context.Context, in *UpdateRolePermissionRequest, opts ...grpc.CallOption) (*UpdateRolePermissionResponse, error) {
+	out := new(UpdateRolePermissionResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_UpdateRolePermission_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetUserRoleInWorkspace(ctx context.Context, in *GetUserRoleInWorkspaceRequest, opts ...grpc.CallOption) (*GetUserRoleInWorkspaceResponse, error) {
+	out := new(GetUserRoleInWorkspaceResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetUserRoleInWorkspace_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
 type WorkspacesServiceServer interface {
 	CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error)
+	GetWorkspaceDetails(context.Context, *GetWorkspaceDetailsRequest) (*GetWorkspaceDetailsResponse, error)
+	GetWorkspaceRoles(context.Context, *GetWorkspaceRolesRequest) (*GetWorkspaceRolesResponse, error)
 	CreateCalendarEvent(context.Context, *CreateCalendarEventRequest) (*CreateCalendarEventResponse, error)
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
 	GetProjectsByWorkspaceId(context.Context, *GetProjectsByWorkspaceIdRequest) (*GetProjectsByWorkspaceIdResponse, error)
 	GetProjectDetails(context.Context, *GetProjectDetailsRequest) (*GetProjectDetailsResponse, error)
+	GetPermissions(context.Context, *EmptyRequest) (*GetPermissionsResponse, error)
+	UpdateRolePermission(context.Context, *UpdateRolePermissionRequest) (*UpdateRolePermissionResponse, error)
+	GetUserRoleInWorkspace(context.Context, *GetUserRoleInWorkspaceRequest) (*GetUserRoleInWorkspaceResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -325,6 +385,12 @@ func (UnimplementedWorkspacesServiceServer) CreateWorkspace(context.Context, *Cr
 func (UnimplementedWorkspacesServiceServer) GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspacesByUserId not implemented")
 }
+func (UnimplementedWorkspacesServiceServer) GetWorkspaceDetails(context.Context, *GetWorkspaceDetailsRequest) (*GetWorkspaceDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspaceDetails not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetWorkspaceRoles(context.Context, *GetWorkspaceRolesRequest) (*GetWorkspaceRolesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspaceRoles not implemented")
+}
 func (UnimplementedWorkspacesServiceServer) CreateCalendarEvent(context.Context, *CreateCalendarEventRequest) (*CreateCalendarEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCalendarEvent not implemented")
 }
@@ -336,6 +402,15 @@ func (UnimplementedWorkspacesServiceServer) GetProjectsByWorkspaceId(context.Con
 }
 func (UnimplementedWorkspacesServiceServer) GetProjectDetails(context.Context, *GetProjectDetailsRequest) (*GetProjectDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProjectDetails not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetPermissions(context.Context, *EmptyRequest) (*GetPermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPermissions not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) UpdateRolePermission(context.Context, *UpdateRolePermissionRequest) (*UpdateRolePermissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRolePermission not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetUserRoleInWorkspace(context.Context, *GetUserRoleInWorkspaceRequest) (*GetUserRoleInWorkspaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserRoleInWorkspace not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -382,6 +457,42 @@ func _WorkspacesService_GetWorkspacesByUserId_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkspacesServiceServer).GetWorkspacesByUserId(ctx, req.(*GetWorkspacesByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetWorkspaceDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkspaceDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetWorkspaceDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetWorkspaceDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetWorkspaceDetails(ctx, req.(*GetWorkspaceDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetWorkspaceRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkspaceRolesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetWorkspaceRoles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetWorkspaceRoles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetWorkspaceRoles(ctx, req.(*GetWorkspaceRolesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -458,6 +569,60 @@ func _WorkspacesService_GetProjectDetails_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_GetPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetPermissions(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_UpdateRolePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRolePermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).UpdateRolePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_UpdateRolePermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).UpdateRolePermission(ctx, req.(*UpdateRolePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetUserRoleInWorkspace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRoleInWorkspaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetUserRoleInWorkspace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetUserRoleInWorkspace_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetUserRoleInWorkspace(ctx, req.(*GetUserRoleInWorkspaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -474,6 +639,14 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _WorkspacesService_GetWorkspacesByUserId_Handler,
 		},
 		{
+			MethodName: "GetWorkspaceDetails",
+			Handler:    _WorkspacesService_GetWorkspaceDetails_Handler,
+		},
+		{
+			MethodName: "GetWorkspaceRoles",
+			Handler:    _WorkspacesService_GetWorkspaceRoles_Handler,
+		},
+		{
 			MethodName: "CreateCalendarEvent",
 			Handler:    _WorkspacesService_CreateCalendarEvent_Handler,
 		},
@@ -488,6 +661,18 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProjectDetails",
 			Handler:    _WorkspacesService_GetProjectDetails_Handler,
+		},
+		{
+			MethodName: "GetPermissions",
+			Handler:    _WorkspacesService_GetPermissions_Handler,
+		},
+		{
+			MethodName: "UpdateRolePermission",
+			Handler:    _WorkspacesService_UpdateRolePermission_Handler,
+		},
+		{
+			MethodName: "GetUserRoleInWorkspace",
+			Handler:    _WorkspacesService_GetUserRoleInWorkspace_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

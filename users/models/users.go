@@ -60,8 +60,10 @@ func (m *UserModel) Insert(ctx context.Context, input *pb.CreateUserRequest) (*p
 func (m *UserModel) Login(ctx context.Context, input *pb.LoginRequest) (*pb.User, error) {
 	user := &User{}
 	row := m.DB.QueryRow("SELECT id, email, hashed_password FROM users WHERE email=$1", input.Email)
+	log.Print(input.Email)
 	err := row.Scan(&user.Id, &user.Email, &user.HashedPassword)
 	if err != nil {
+		log.Print(err)
 		return nil, errors.New("email not existed")
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(input.Password))
@@ -89,6 +91,8 @@ func (m *UserModel) GetUserById(ctx context.Context, input *pb.GetUserByIdReques
 	} else {
 		log.Print(err)
 	}
+
+	m.DB.QueryRow("SELECT role_id FROM workspace_members WHERE workspace_id = $1 AND user_id = $2")
 
 	return user, nil
 }

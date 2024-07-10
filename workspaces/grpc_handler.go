@@ -45,3 +45,23 @@ func (s *server) GetProjectsByWorkspaceId(ctx context.Context, in *pb.GetProject
 func (s *server) GetProjectDetails(ctx context.Context, in *pb.GetProjectDetailsRequest) (*pb.GetProjectDetailsResponse, error) {
 	return s.ProjectModel.GetProjectDetails(ctx, in)
 }
+
+func (s *server) GetWorkspaceDetails(ctx context.Context, in *pb.GetWorkspaceDetailsRequest) (*pb.GetWorkspaceDetailsResponse, error) {
+	return s.WorkspaceModel.GetWorkspaceDetails(ctx, in)
+}
+
+func (s *server) GetPermissions(ctx context.Context, in *pb.EmptyRequest) (*pb.GetPermissionsResponse, error) {
+	return s.WorkspaceModel.GetPermissions(ctx, in)
+}
+
+func (s *server) UpdateRolePermission(ctx context.Context, in *pb.UpdateRolePermissionRequest) (*pb.UpdateRolePermissionResponse, error) {
+	return s.WorkspaceModel.UpdateRolePermission(ctx, in)
+}
+
+func (s *server) GetWorkspaceRoles(ctx context.Context, in *pb.GetWorkspaceRolesRequest) (*pb.GetWorkspaceRolesResponse, error) {
+	return s.WorkspaceModel.GetWorkspaceRoles(ctx, in)
+}
+
+func (s *server) GetUserRoleInWorkspace(ctx context.Context, in *pb.GetUserRoleInWorkspaceRequest) (*pb.GetUserRoleInWorkspaceResponse, error) {
+	return nil, nil
+}

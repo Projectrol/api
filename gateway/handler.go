@@ -298,6 +298,36 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 	common.WriteJSON(w, http.StatusCreated, common.Envelop{"projects": res.Projects})
 }
 
+func (app *application) GetWorkspaceDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	workspaceId, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || workspaceId < 0 {
+		errMsg := common.Envelop{"error": "Invalid workspace id"}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewWorkspacesServiceClient(conn)
+	// userId := r.Context().Value(common.ContextUserIdKey).(int)
+	request := &pb.GetWorkspaceDetailsRequest{
+		Id: int32(workspaceId),
+	}
+
+	ctx := context.Background()
+	response, err := client.GetWorkspaceDetails(ctx, request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response})
+}
+
 func (app *application) GetProjectDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	workspaceSlug := params.ByName("workspaceSlug")
@@ -379,4 +409,72 @@ func (app *application) UpdateUserNotificationsSettingsHandler(w http.ResponseWr
 		return
 	}
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"settings": response.Settings})
+}
+
+func (app *application) GetPermissionsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewWorkspacesServiceClient(conn)
+	request := &pb.EmptyRequest{}
+
+	ctx := context.Background()
+	response, err := client.GetPermissions(ctx, request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusCreated, common.Envelop{"permissions": response.Permissions})
+}
+
+func (app *application) UpdateRolePermissionHandler(w http.ResponseWriter, r *http.Request) {
+	request := &pb.UpdateRolePermissionRequest{}
+	err := common.ReadJSON(r, request)
+	if err != nil {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid body format"})
+		return
+	}
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	c := pb.NewWorkspacesServiceClient(conn)
+	response, err := c.UpdateRolePermission(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"role": response.Role})
+}
+
+func (app *application) GetWorkspaceRolesHandler(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	workspaceId, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || workspaceId < 0 {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid workspace id"})
+		return
+	}
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	request := &pb.GetWorkspaceRolesRequest{
+		Id: int32(workspaceId),
+	}
+	c := pb.NewWorkspacesServiceClient(conn)
+	response, err := c.GetWorkspaceRoles(context.Background(), request)
+	if err != nil {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": err.Error()})
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"roles": response.Roles})
 }

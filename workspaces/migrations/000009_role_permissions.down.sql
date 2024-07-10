@@ -1,0 +1,1 @@
+DELETE TABLE IF EXISTS role_permissions;

@@ -1,13 +1,10 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"database/sql"
 	"log"
 	"net"
-	"strconv"
 
-	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
 	"github.com/lehoangvuvt/projectrol/users/models"
 	_ "github.com/lib/pq"
@@ -15,17 +12,17 @@ import (
 )
 
 func main() {
-	dbUsername := common.GetEnvValByKey("DB_USERNAME", "postgres")
-	dbPassword := common.GetEnvValByKey("DB_PASSWORD", "admin")
-	dbHost := common.GetEnvValByKey("DB_HOST", "localhost")
-	dbName := common.GetEnvValByKey("DB_NAME", "postgres")
-	portStr := common.GetEnvValByKey("DB_PORT", "5432")
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		port = 5432
-	}
-	connectionStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", dbUsername, dbPassword, dbHost, port, dbName)
-	db, err := common.ConnectToDatabase(context.Background(), "postgres", connectionStr)
+	// dbUsername := common.GetEnvValByKey("DB_USERNAME", "postgres")
+	// dbPassword := common.GetEnvValByKey("DB_PASSWORD", "admin")
+	// dbHost := common.GetEnvValByKey("DB_HOST", "localhost")
+	// dbName := common.GetEnvValByKey("DB_NAME", "postgres")
+	// portStr := common.GetEnvValByKey("DB_PORT", "5432")
+	// port, err := strconv.Atoi(portStr)
+	// if err != nil {
+	// 	port = 5432
+	// }
+	db, err := sql.Open("postgres", `user=postgres.lqbmyowwxeggcrxijdan 
+	password=pc1264183vT. dbname=postgres host=aws-0-ap-southeast-1.pooler.supabase.com port=6543 binary_parameters=yes`)
 	if err != nil {
 		log.Fatalf("Cannot connect to database. Error: " + err.Error())
 	}

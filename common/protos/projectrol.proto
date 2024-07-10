@@ -3,6 +3,8 @@ syntax = "proto3";
 option go_package = "github.com/lehoangvuvt/projectrol/common/protos";
 package protos;
 
+message EmptyRequest {}
+
 message CreateUserRequest {
  string email = 1;
  string password = 2;
@@ -36,7 +38,6 @@ message Workspace {
     string nanoid = 2;
     string name = 3;
     string slug = 4;
-    WorkspaceSettings settings = 5;
 }
 
 message WorkspaceSettings {
@@ -164,6 +165,65 @@ message GetUserNotificationsSettingsResponse {
     UserNotificationsSettings settings = 1;
 }
 
+message Permission {
+    int32 id = 1;
+    string resource_tag = 2;
+    string title = 3;
+    string description = 4;
+    bool can_read = 5;
+    bool can_create = 6;
+    bool can_update = 7;
+    bool can_delete = 8;
+}
+
+message WorkspaceRole {
+    int32 id = 1;
+    int32 workspace_id = 2;
+    string role_name = 3;
+    repeated Permission permissions = 4;
+}
+
+message GetWorkspaceDetailsRequest {
+    int32 id = 1;
+}
+
+message GetWorkspaceDetailsResponse {
+    Workspace general_information = 1;
+    WorkspaceSettings settings = 2;
+}
+
+message GetPermissionsResponse {
+    repeated Permission permissions = 1;
+}
+
+message UpdateRolePermissionRequest {
+    int32 role_id = 1;
+    string resource_tag = 2;
+    string action = 3; //can_read, can_update, can_create, can_delete //
+    string update_type = 4; // remove, add //
+}
+
+message UpdateRolePermissionResponse {
+    WorkspaceRole role = 1;
+}
+
+message GetWorkspaceRolesRequest {
+    int32 id = 1;
+}
+
+message GetWorkspaceRolesResponse {
+   repeated WorkspaceRole roles = 1;
+}
+
+message GetUserRoleInWorkspaceRequest {
+    int32 user_id = 1;
+    int32 workspace_id = 2;
+}
+
+message GetUserRoleInWorkspaceResponse {
+    WorkspaceRole role = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -174,10 +234,15 @@ service UsersService {
 service WorkspacesService {
     rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
     rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
+    rpc GetWorkspaceDetails(GetWorkspaceDetailsRequest) returns(GetWorkspaceDetailsResponse);
+    rpc GetWorkspaceRoles(GetWorkspaceRolesRequest) returns(GetWorkspaceRolesResponse);
     rpc CreateCalendarEvent(CreateCalendarEventRequest) returns(CreateCalendarEventResponse);
     rpc CreateProject(CreateProjectRequest) returns(CreateProjectResponse);
     rpc GetProjectsByWorkspaceId(GetProjectsByWorkspaceIdRequest) returns(GetProjectsByWorkspaceIdResponse);
     rpc GetProjectDetails(GetProjectDetailsRequest) returns(GetProjectDetailsResponse);
+    rpc GetPermissions(EmptyRequest) returns(GetPermissionsResponse);
+    rpc UpdateRolePermission(UpdateRolePermissionRequest) returns(UpdateRolePermissionResponse);
+    rpc GetUserRoleInWorkspace(GetUserRoleInWorkspaceRequest) returns(GetUserRoleInWorkspaceResponse);
 }
 
 service NotificationsService {  
