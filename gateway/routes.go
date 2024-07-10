@@ -25,7 +25,8 @@ func (app *application) getRoutes() *http.Handler {
 	router.HandlerFunc(http.MethodPost, "/api/workspaces/create", app.AuthGuard(app.CreateWorkspaceHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.GetProjectsByWorkspaceIdHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id", app.AuthGuard(app.GetWorkspaceDetailsHandler))
-	router.HandlerFunc(http.MethodGet, "/api/workspace-roles/:id", app.AuthGuard(app.GetWorkspaceRolesHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/roles", app.AuthGuard(app.GetWorkspaceRolesHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/user/role", app.AuthGuard(app.GetUserRoleInWorkspaceHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/calendar-events/create", app.AuthGuard(app.CreateCalendarEventHandler))
 

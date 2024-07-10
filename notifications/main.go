@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -46,8 +46,14 @@ func main() {
 	if err != nil {
 		port = 5432
 	}
-	connectionStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", dbUsername, dbPassword, dbHost, port, dbName)
-	db, err := common.ConnectToDatabase(context.Background(), "postgres", connectionStr)
+	db, err := sql.Open("postgres", fmt.Sprintf(`user=%s 
+	password=%s dbname=%s host=%s port=%d binary_parameters=yes`,
+		dbUsername,
+		dbPassword,
+		dbName,
+		dbHost,
+		port,
+	))
 	if err != nil {
 		log.Fatalf("Cannot connect to database. Error: " + err.Error())
 	}

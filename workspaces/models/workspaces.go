@@ -264,6 +264,38 @@ func (m *WorkspaceModel) GetWorkspaceRoles(ctx context.Context, in *pb.GetWorksp
 }
 
 func (m *WorkspaceModel) GetUserRoleInWorkspace(ctx context.Context, in *pb.GetUserRoleInWorkspaceRequest) (*pb.GetUserRoleInWorkspaceResponse, error) {
-	m.DB.Query("SELECT role_id")
-	return nil, nil
+	role := &pb.WorkspaceRole{}
+	err := m.DB.QueryRow(`SELECT WR.id, WR.workspace_id, WR.role_name FROM workspace_roles WR
+							LEFT JOIN workspace_members WM
+							ON WR.id = WM.role_id
+							WHERE WM.user_id = $1 AND WM.workspace_id = $2`, in.UserId, in.WorkspaceId).
+		Scan(&role.Id, &role.WorkspaceId, &role.RoleName)
+	if err != nil {
+		return nil, err
+	}
+	pRows, err := m.DB.Query(`SELECT permissions.id, resource_tag, title, description, can_read, can_create, can_update, can_delete 
+											FROM permissions 
+											LEFT JOIN role_permissions
+											ON permissions.id = role_permissions.permission_id
+											WHERE role_permissions.role_id = $1`, role.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	var permissions []*pb.Permission
+	for pRows.Next() {
+		permission := &pb.Permission{}
+		err = pRows.Scan(&permission.Id,
+			&permission.ResourceTag,
+			&permission.Title,
+			&permission.Description,
+			&permission.CanRead, &permission.CanCreate, &permission.CanUpdate, &permission.CanDelete,
+		)
+		if err == nil {
+			permissions = append(permissions, permission)
+		}
+	}
+	role.Permissions = permissions
+
+	return &pb.GetUserRoleInWorkspaceResponse{Role: role}, nil
 }

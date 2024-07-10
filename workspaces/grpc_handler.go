@@ -63,5 +63,5 @@ func (s *server) GetWorkspaceRoles(ctx context.Context, in *pb.GetWorkspaceRoles
 }
 
 func (s *server) GetUserRoleInWorkspace(ctx context.Context, in *pb.GetUserRoleInWorkspaceRequest) (*pb.GetUserRoleInWorkspaceResponse, error) {
-	return nil, nil
+	return s.WorkspaceModel.GetUserRoleInWorkspace(ctx, in)
 }
