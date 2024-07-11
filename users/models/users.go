@@ -9,6 +9,8 @@ import (
 
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type User struct {
@@ -92,7 +94,15 @@ func (m *UserModel) GetUserById(ctx context.Context, input *pb.GetUserByIdReques
 		log.Print(err)
 	}
 
-	m.DB.QueryRow("SELECT role_id FROM workspace_members WHERE workspace_id = $1 AND user_id = $2")
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err == nil {
+		c := pb.NewWorkspacesServiceClient(conn)
+		response, err := c.GetRoleIdOfUserWorkspaces(ctx, &pb.GetRoleIdOfUserWorkspacesRequest{UserId: user.Id})
+		if err == nil {
+			user.WorkspaceRoleIdList = response.WorkpaceRoleIdList
+		}
+	}
 
 	return user, nil
 }

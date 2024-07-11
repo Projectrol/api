@@ -65,3 +65,12 @@ func (s *server) GetWorkspaceRoles(ctx context.Context, in *pb.GetWorkspaceRoles
 func (s *server) GetUserRoleInWorkspace(ctx context.Context, in *pb.GetUserRoleInWorkspaceRequest) (*pb.GetUserRoleInWorkspaceResponse, error) {
 	return s.WorkspaceModel.GetUserRoleInWorkspace(ctx, in)
 }
+
+func (s *server) GetRoleIdOfUserWorkspaces(ctx context.Context, in *pb.GetRoleIdOfUserWorkspacesRequest) (*pb.GetRoleIdOfUserWorkspacesResponse, error) {
+	return s.WorkspaceModel.GetRoleIdOfUserWorkspaces(ctx, in)
+}
+
+func (s *server) CheckRoleValidForResource(ctx context.Context, in *pb.CheckRoleValidForResourceRequest) (*pb.CheckRoleValidForResourceResponse, error) {
+
+	return s.WorkspaceModel.CheckRoleValidForResource(ctx, in)
+}

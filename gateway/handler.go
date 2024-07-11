@@ -88,7 +88,9 @@ func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	successMsg := common.Envelop{"message": "success", "user": res}
-	token, _ := common.SignToken(common.Envelop{"sub": res.Id}, 60, "access_token")
+	dataToSign := common.Envelop{"sub": res.Id, "workspaces_role": res.WorkspaceRoleIdList}
+	token, _ := common.SignToken(dataToSign, 60, "access_token")
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    token,

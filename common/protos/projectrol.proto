@@ -31,6 +31,7 @@ message User {
     int32 id = 1;
     string email = 2;
     UserSettings settings = 3;
+    repeated WorkspaceRoleId workspaceRoleIdList = 4;
 }
 
 message Workspace {
@@ -224,6 +225,29 @@ message GetUserRoleInWorkspaceResponse {
     WorkspaceRole role = 1;
 }
 
+message GetRoleIdOfUserWorkspacesRequest {
+    int32 userId = 1;
+}
+
+message WorkspaceRoleId {
+    int32 workspaceId = 1;
+    int32 roleId = 2;   
+}
+
+message GetRoleIdOfUserWorkspacesResponse {
+   repeated WorkspaceRoleId workpaceRoleIdList = 1;
+}
+
+message CheckRoleValidForResourceRequest {
+    int32 roleId = 1;
+    string resourceTag = 2;
+    string method = 3;
+}
+
+message CheckRoleValidForResourceResponse {
+    bool isValid = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -234,6 +258,7 @@ service UsersService {
 service WorkspacesService {
     rpc CreateWorkspace(CreateWorkspaceRequest) returns(CreateWorkspaceResponse);
     rpc GetWorkspacesByUserId(GetWorkspacesByUserIdRequest) returns(GetWorkspacesByUserIdResponse);
+    rpc GetRoleIdOfUserWorkspaces(GetRoleIdOfUserWorkspacesRequest) returns(GetRoleIdOfUserWorkspacesResponse);
     rpc GetWorkspaceDetails(GetWorkspaceDetailsRequest) returns(GetWorkspaceDetailsResponse);
     rpc GetWorkspaceRoles(GetWorkspaceRolesRequest) returns(GetWorkspaceRolesResponse);
     rpc CreateCalendarEvent(CreateCalendarEventRequest) returns(CreateCalendarEventResponse);
@@ -243,6 +268,7 @@ service WorkspacesService {
     rpc GetPermissions(EmptyRequest) returns(GetPermissionsResponse);
     rpc UpdateRolePermission(UpdateRolePermissionRequest) returns(UpdateRolePermissionResponse);
     rpc GetUserRoleInWorkspace(GetUserRoleInWorkspaceRequest) returns(GetUserRoleInWorkspaceResponse);
+    rpc CheckRoleValidForResource(CheckRoleValidForResourceRequest) returns(CheckRoleValidForResourceResponse);
 }
 
 service NotificationsService {  

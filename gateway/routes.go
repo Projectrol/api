@@ -22,16 +22,17 @@ func (app *application) getRoutes() *http.Handler {
 	router.HandlerFunc(http.MethodGet, "/api/users/logout", app.AuthGuard(app.Logout))
 	router.HandlerFunc(http.MethodGet, "/api/authenticate", app.AuthGuard(app.AuthenticateHandler))
 
-	router.HandlerFunc(http.MethodPost, "/api/workspaces/create", app.AuthGuard(app.CreateWorkspaceHandler))
-	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.GetProjectsByWorkspaceIdHandler))
+	router.HandlerFunc(http.MethodPost, "/api/workspaces", app.AuthGuard(app.CreateWorkspaceHandler))
+
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.AuthorizeGuard(app.GetProjectsByWorkspaceIdHandler)))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id", app.AuthGuard(app.GetWorkspaceDetailsHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/roles", app.AuthGuard(app.GetWorkspaceRolesHandler))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/user/role", app.AuthGuard(app.GetUserRoleInWorkspaceHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/calendar-events/create", app.AuthGuard(app.CreateCalendarEventHandler))
 
-	router.HandlerFunc(http.MethodPost, "/api/projects/create", app.AuthGuard(app.CreateProjectHandler))
-	router.HandlerFunc(http.MethodGet, "/api/projects/:workspaceSlug/:projectSlug", app.AuthGuard(app.GetProjectDetailsHandler))
+	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/projects/create", app.AuthGuard(app.AuthorizeGuard(app.CreateProjectHandler)))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects/:projectSlug", app.AuthGuard(app.GetProjectDetailsHandler))
 
 	router.HandlerFunc(http.MethodGet, "/api/notifications/user-settings", app.AuthGuard(app.GetUserNotificationsSettingsHandler))
 	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))

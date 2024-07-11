@@ -299,3 +299,48 @@ func (m *WorkspaceModel) GetUserRoleInWorkspace(ctx context.Context, in *pb.GetU
 
 	return &pb.GetUserRoleInWorkspaceResponse{Role: role}, nil
 }
+
+func (m *WorkspaceModel) GetRoleIdOfUserWorkspaces(ctx context.Context, in *pb.GetRoleIdOfUserWorkspacesRequest) (*pb.GetRoleIdOfUserWorkspacesResponse, error) {
+	rows, err := m.DB.Query("SELECT role_id, workspace_id FROM workspace_members WHERE user_id = $1", in.UserId)
+	if err != nil {
+		return nil, err
+	}
+	var workspaceRoleIdList []*pb.WorkspaceRoleId
+	for rows.Next() {
+		workspaceRoleId := &pb.WorkspaceRoleId{}
+		err = rows.Scan(&workspaceRoleId.RoleId, &workspaceRoleId.WorkspaceId)
+		if err == nil {
+			workspaceRoleIdList = append(workspaceRoleIdList, workspaceRoleId)
+		}
+	}
+	return &pb.GetRoleIdOfUserWorkspacesResponse{WorkpaceRoleIdList: workspaceRoleIdList}, nil
+}
+
+func (m *WorkspaceModel) CheckRoleValidForResource(ctx context.Context, in *pb.CheckRoleValidForResourceRequest) (*pb.CheckRoleValidForResourceResponse, error) {
+	permissionType := ""
+	roleId := in.RoleId
+	resourceTag := in.ResourceTag
+
+	switch in.Method {
+	case "POST":
+		permissionType = "can_create"
+	case "PATCH":
+		permissionType = "can_update"
+	case "DELETE":
+		permissionType = "can_delete"
+	case "GET":
+		permissionType = "can_read"
+	}
+
+	queryStr := fmt.Sprintf(`SELECT COUNT(*) FROM permissions 
+							LEFT JOIN role_permissions 
+							ON permissions.id = role_permissions.permission_id 
+							WHERE role_permissions.role_id = %d AND %s = 'true' AND resource_tag = '%s'`, roleId, permissionType, resourceTag)
+	var count int
+	log.Print(queryStr)
+	err := m.DB.QueryRow(queryStr).Scan(&count)
+	if err != nil || count == 0 {
+		return &pb.CheckRoleValidForResourceResponse{IsValid: false}, nil
+	}
+	return &pb.CheckRoleValidForResourceResponse{IsValid: true}, nil
+}

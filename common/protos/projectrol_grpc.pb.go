@@ -220,17 +220,19 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	WorkspacesService_CreateWorkspace_FullMethodName          = "/protos.WorkspacesService/CreateWorkspace"
-	WorkspacesService_GetWorkspacesByUserId_FullMethodName    = "/protos.WorkspacesService/GetWorkspacesByUserId"
-	WorkspacesService_GetWorkspaceDetails_FullMethodName      = "/protos.WorkspacesService/GetWorkspaceDetails"
-	WorkspacesService_GetWorkspaceRoles_FullMethodName        = "/protos.WorkspacesService/GetWorkspaceRoles"
-	WorkspacesService_CreateCalendarEvent_FullMethodName      = "/protos.WorkspacesService/CreateCalendarEvent"
-	WorkspacesService_CreateProject_FullMethodName            = "/protos.WorkspacesService/CreateProject"
-	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
-	WorkspacesService_GetProjectDetails_FullMethodName        = "/protos.WorkspacesService/GetProjectDetails"
-	WorkspacesService_GetPermissions_FullMethodName           = "/protos.WorkspacesService/GetPermissions"
-	WorkspacesService_UpdateRolePermission_FullMethodName     = "/protos.WorkspacesService/UpdateRolePermission"
-	WorkspacesService_GetUserRoleInWorkspace_FullMethodName   = "/protos.WorkspacesService/GetUserRoleInWorkspace"
+	WorkspacesService_CreateWorkspace_FullMethodName           = "/protos.WorkspacesService/CreateWorkspace"
+	WorkspacesService_GetWorkspacesByUserId_FullMethodName     = "/protos.WorkspacesService/GetWorkspacesByUserId"
+	WorkspacesService_GetRoleIdOfUserWorkspaces_FullMethodName = "/protos.WorkspacesService/GetRoleIdOfUserWorkspaces"
+	WorkspacesService_GetWorkspaceDetails_FullMethodName       = "/protos.WorkspacesService/GetWorkspaceDetails"
+	WorkspacesService_GetWorkspaceRoles_FullMethodName         = "/protos.WorkspacesService/GetWorkspaceRoles"
+	WorkspacesService_CreateCalendarEvent_FullMethodName       = "/protos.WorkspacesService/CreateCalendarEvent"
+	WorkspacesService_CreateProject_FullMethodName             = "/protos.WorkspacesService/CreateProject"
+	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName  = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
+	WorkspacesService_GetProjectDetails_FullMethodName         = "/protos.WorkspacesService/GetProjectDetails"
+	WorkspacesService_GetPermissions_FullMethodName            = "/protos.WorkspacesService/GetPermissions"
+	WorkspacesService_UpdateRolePermission_FullMethodName      = "/protos.WorkspacesService/UpdateRolePermission"
+	WorkspacesService_GetUserRoleInWorkspace_FullMethodName    = "/protos.WorkspacesService/GetUserRoleInWorkspace"
+	WorkspacesService_CheckRoleValidForResource_FullMethodName = "/protos.WorkspacesService/CheckRoleValidForResource"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -239,6 +241,7 @@ const (
 type WorkspacesServiceClient interface {
 	CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error)
+	GetRoleIdOfUserWorkspaces(ctx context.Context, in *GetRoleIdOfUserWorkspacesRequest, opts ...grpc.CallOption) (*GetRoleIdOfUserWorkspacesResponse, error)
 	GetWorkspaceDetails(ctx context.Context, in *GetWorkspaceDetailsRequest, opts ...grpc.CallOption) (*GetWorkspaceDetailsResponse, error)
 	GetWorkspaceRoles(ctx context.Context, in *GetWorkspaceRolesRequest, opts ...grpc.CallOption) (*GetWorkspaceRolesResponse, error)
 	CreateCalendarEvent(ctx context.Context, in *CreateCalendarEventRequest, opts ...grpc.CallOption) (*CreateCalendarEventResponse, error)
@@ -248,6 +251,7 @@ type WorkspacesServiceClient interface {
 	GetPermissions(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPermissionsResponse, error)
 	UpdateRolePermission(ctx context.Context, in *UpdateRolePermissionRequest, opts ...grpc.CallOption) (*UpdateRolePermissionResponse, error)
 	GetUserRoleInWorkspace(ctx context.Context, in *GetUserRoleInWorkspaceRequest, opts ...grpc.CallOption) (*GetUserRoleInWorkspaceResponse, error)
+	CheckRoleValidForResource(ctx context.Context, in *CheckRoleValidForResourceRequest, opts ...grpc.CallOption) (*CheckRoleValidForResourceResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -270,6 +274,15 @@ func (c *workspacesServiceClient) CreateWorkspace(ctx context.Context, in *Creat
 func (c *workspacesServiceClient) GetWorkspacesByUserId(ctx context.Context, in *GetWorkspacesByUserIdRequest, opts ...grpc.CallOption) (*GetWorkspacesByUserIdResponse, error) {
 	out := new(GetWorkspacesByUserIdResponse)
 	err := c.cc.Invoke(ctx, WorkspacesService_GetWorkspacesByUserId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetRoleIdOfUserWorkspaces(ctx context.Context, in *GetRoleIdOfUserWorkspacesRequest, opts ...grpc.CallOption) (*GetRoleIdOfUserWorkspacesResponse, error) {
+	out := new(GetRoleIdOfUserWorkspacesResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetRoleIdOfUserWorkspaces_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -357,12 +370,22 @@ func (c *workspacesServiceClient) GetUserRoleInWorkspace(ctx context.Context, in
 	return out, nil
 }
 
+func (c *workspacesServiceClient) CheckRoleValidForResource(ctx context.Context, in *CheckRoleValidForResourceRequest, opts ...grpc.CallOption) (*CheckRoleValidForResourceResponse, error) {
+	out := new(CheckRoleValidForResourceResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_CheckRoleValidForResource_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
 type WorkspacesServiceServer interface {
 	CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error)
 	GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error)
+	GetRoleIdOfUserWorkspaces(context.Context, *GetRoleIdOfUserWorkspacesRequest) (*GetRoleIdOfUserWorkspacesResponse, error)
 	GetWorkspaceDetails(context.Context, *GetWorkspaceDetailsRequest) (*GetWorkspaceDetailsResponse, error)
 	GetWorkspaceRoles(context.Context, *GetWorkspaceRolesRequest) (*GetWorkspaceRolesResponse, error)
 	CreateCalendarEvent(context.Context, *CreateCalendarEventRequest) (*CreateCalendarEventResponse, error)
@@ -372,6 +395,7 @@ type WorkspacesServiceServer interface {
 	GetPermissions(context.Context, *EmptyRequest) (*GetPermissionsResponse, error)
 	UpdateRolePermission(context.Context, *UpdateRolePermissionRequest) (*UpdateRolePermissionResponse, error)
 	GetUserRoleInWorkspace(context.Context, *GetUserRoleInWorkspaceRequest) (*GetUserRoleInWorkspaceResponse, error)
+	CheckRoleValidForResource(context.Context, *CheckRoleValidForResourceRequest) (*CheckRoleValidForResourceResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -384,6 +408,9 @@ func (UnimplementedWorkspacesServiceServer) CreateWorkspace(context.Context, *Cr
 }
 func (UnimplementedWorkspacesServiceServer) GetWorkspacesByUserId(context.Context, *GetWorkspacesByUserIdRequest) (*GetWorkspacesByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspacesByUserId not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetRoleIdOfUserWorkspaces(context.Context, *GetRoleIdOfUserWorkspacesRequest) (*GetRoleIdOfUserWorkspacesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoleIdOfUserWorkspaces not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) GetWorkspaceDetails(context.Context, *GetWorkspaceDetailsRequest) (*GetWorkspaceDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspaceDetails not implemented")
@@ -411,6 +438,9 @@ func (UnimplementedWorkspacesServiceServer) UpdateRolePermission(context.Context
 }
 func (UnimplementedWorkspacesServiceServer) GetUserRoleInWorkspace(context.Context, *GetUserRoleInWorkspaceRequest) (*GetUserRoleInWorkspaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserRoleInWorkspace not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) CheckRoleValidForResource(context.Context, *CheckRoleValidForResourceRequest) (*CheckRoleValidForResourceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckRoleValidForResource not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -457,6 +487,24 @@ func _WorkspacesService_GetWorkspacesByUserId_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkspacesServiceServer).GetWorkspacesByUserId(ctx, req.(*GetWorkspacesByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetRoleIdOfUserWorkspaces_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRoleIdOfUserWorkspacesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetRoleIdOfUserWorkspaces(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetRoleIdOfUserWorkspaces_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetRoleIdOfUserWorkspaces(ctx, req.(*GetRoleIdOfUserWorkspacesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -623,6 +671,24 @@ func _WorkspacesService_GetUserRoleInWorkspace_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_CheckRoleValidForResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckRoleValidForResourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).CheckRoleValidForResource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_CheckRoleValidForResource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).CheckRoleValidForResource(ctx, req.(*CheckRoleValidForResourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -637,6 +703,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkspacesByUserId",
 			Handler:    _WorkspacesService_GetWorkspacesByUserId_Handler,
+		},
+		{
+			MethodName: "GetRoleIdOfUserWorkspaces",
+			Handler:    _WorkspacesService_GetRoleIdOfUserWorkspaces_Handler,
 		},
 		{
 			MethodName: "GetWorkspaceDetails",
@@ -673,6 +743,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserRoleInWorkspace",
 			Handler:    _WorkspacesService_GetUserRoleInWorkspace_Handler,
+		},
+		{
+			MethodName: "CheckRoleValidForResource",
+			Handler:    _WorkspacesService_CheckRoleValidForResource_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
