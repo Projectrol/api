@@ -38,7 +38,8 @@ func (app *application) getRoutes() *http.Handler {
 	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))
 
 	router.HandlerFunc(http.MethodGet, "/api/permissions", app.GetPermissionsHandler)
-	router.HandlerFunc(http.MethodPatch, "/api/permissions", app.AuthGuard(app.UpdateRolePermissionHandler))
+
+	router.HandlerFunc(http.MethodPatch, "/api/workspaces/:id/roles", app.AuthGuard(app.UpdateRolePermissionHandler))
 
 	handler := crs.Handler(router)
 	return &handler

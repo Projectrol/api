@@ -77,13 +77,27 @@ func (m *WorkspaceModel) Insert(ctx context.Context, input *pb.CreateWorkspaceRe
 		switch i {
 		case 0:
 			roleName = "Owner"
-			permissionIds = []int{
-				1, 2, 3, 4, 5, 6,
+			rows, err := m.DB.Query("SELECT id FROM permissions ORDER BY created_at ASC")
+			if err == nil {
+				for rows.Next() {
+					var permissionId int
+					err = rows.Scan(&permissionId)
+					if err == nil {
+						permissionIds = append(permissionIds, permissionId)
+					}
+				}
 			}
 		case 1:
 			roleName = "Admin"
-			permissionIds = []int{
-				3, 4, 5, 6,
+			rows, err := m.DB.Query("SELECT id FROM permissions WHERE resource_tag != 'workspaces' ORDER BY created_at ASC")
+			if err == nil {
+				for rows.Next() {
+					var permissionId int
+					err = rows.Scan(&permissionId)
+					if err == nil {
+						permissionIds = append(permissionIds, permissionId)
+					}
+				}
 			}
 		}
 		err = m.DB.QueryRow("INSERT INTO workspace_roles(workspace_id, role_name) VALUES($1, $2) RETURNING id", id, roleName).
@@ -139,7 +153,7 @@ func (m *WorkspaceModel) GetWorkspaceDetails(ctx context.Context, in *pb.GetWork
 	var nanoid string
 	var name string
 	var slug string
-	err := m.DB.QueryRow("SELECT id, nanoid, name, slug FROM workspaces WHERE id = 46").
+	err := m.DB.QueryRow("SELECT id, nanoid, name, slug FROM workspaces WHERE id = $1", in.Id).
 		Scan(&id,
 			&nanoid,
 			&name,
@@ -166,7 +180,9 @@ func (m *WorkspaceModel) GetWorkspaceDetails(ctx context.Context, in *pb.GetWork
 }
 
 func (m *WorkspaceModel) GetPermissions(ctx context.Context, in *pb.EmptyRequest) (*pb.GetPermissionsResponse, error) {
-	rows, err := m.DB.Query("SELECT id, resource_tag, title, description, can_read, can_create, can_update, can_delete FROM permissions")
+	rows, err := m.DB.Query(`SELECT id, resource_tag, title, description, 
+							can_read, can_create, can_update, can_delete FROM permissions 
+							ORDER BY created_at ASC`)
 	if err != nil {
 		return nil, err
 	}
