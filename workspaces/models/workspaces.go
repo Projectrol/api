@@ -360,3 +360,31 @@ func (m *WorkspaceModel) CheckRoleValidForResource(ctx context.Context, in *pb.C
 	}
 	return &pb.CheckRoleValidForResourceResponse{IsValid: true}, nil
 }
+
+func (m *WorkspaceModel) CreateNewRole(ctx context.Context, in *pb.CreateNewRoleRequest) (*pb.CreateNewRoleResponse, error) {
+	var count int
+	err := m.DB.QueryRow("SELECT COUNT(*) FROM workspace_roles WHERE role_name ILIKE $1 AND workspace_id = $2", in.RoleName, in.WorkspaceId).
+		Scan(&count)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if count > 0 {
+		return nil, errors.New("duplicate role_name")
+	}
+
+	var roleId int
+	err = m.DB.QueryRow("INSERT INTO workspace_roles(workspace_id, role_name) VALUES ($1, $2) RETURNING id", in.WorkspaceId, in.RoleName).
+		Scan(&roleId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, permissionId := range in.PermissionIds {
+		m.DB.Exec("INSERT INTO role_permissions(role_id, permission_id) VALUES($1, $2)", roleId, permissionId)
+	}
+
+	return &pb.CreateNewRoleResponse{Id: int32(roleId)}, nil
+}

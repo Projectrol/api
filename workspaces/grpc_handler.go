@@ -74,3 +74,7 @@ func (s *server) CheckRoleValidForResource(ctx context.Context, in *pb.CheckRole
 
 	return s.WorkspaceModel.CheckRoleValidForResource(ctx, in)
 }
+
+func (s *server) CreateNewRole(ctx context.Context, in *pb.CreateNewRoleRequest) (*pb.CreateNewRoleResponse, error) {
+	return s.WorkspaceModel.CreateNewRole(ctx, in)
+}

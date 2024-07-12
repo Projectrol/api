@@ -433,6 +433,29 @@ func (app *application) GetPermissionsHandler(w http.ResponseWriter, r *http.Req
 	common.WriteJSON(w, http.StatusCreated, common.Envelop{"permissions": response.Permissions})
 }
 
+func (app *application) CreateNewRoleHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	c := pb.NewWorkspacesServiceClient(conn)
+	request := &pb.CreateNewRoleRequest{}
+	err = common.ReadJSON(r, request)
+	if err != nil {
+		errMsg := common.Envelop{"error": "Invalid body data. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	response, err := c.CreateNewRole(context.Background(), request)
+	if err != nil {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": err.Error()})
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"role_id": response.Id})
+}
+
 func (app *application) UpdateRolePermissionHandler(w http.ResponseWriter, r *http.Request) {
 	request := &pb.UpdateRolePermissionRequest{}
 	err := common.ReadJSON(r, request)

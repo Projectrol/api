@@ -248,6 +248,16 @@ message CheckRoleValidForResourceResponse {
     bool isValid = 1;
 }
 
+message  CreateNewRoleRequest {
+    int32 workspace_id = 1;
+    string role_name = 2;
+    repeated int32 permission_ids = 3;
+}
+
+message CreateNewRoleResponse {
+   int32 id = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -269,6 +279,7 @@ service WorkspacesService {
     rpc UpdateRolePermission(UpdateRolePermissionRequest) returns(UpdateRolePermissionResponse);
     rpc GetUserRoleInWorkspace(GetUserRoleInWorkspaceRequest) returns(GetUserRoleInWorkspaceResponse);
     rpc CheckRoleValidForResource(CheckRoleValidForResourceRequest) returns(CheckRoleValidForResourceResponse);
+    rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
 }
 
 service NotificationsService {  

@@ -26,20 +26,21 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects", app.AuthGuard(app.AuthorizeGuard(app.GetProjectsByWorkspaceIdHandler)))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id", app.AuthGuard(app.GetWorkspaceDetailsHandler))
-	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/roles", app.AuthGuard(app.GetWorkspaceRolesHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/roles", app.AuthGuard(app.AuthorizeGuard(app.GetWorkspaceRolesHandler)))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/user/role", app.AuthGuard(app.GetUserRoleInWorkspaceHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/calendar-events/create", app.AuthGuard(app.CreateCalendarEventHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/projects/create", app.AuthGuard(app.AuthorizeGuard(app.CreateProjectHandler)))
-	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects/:projectSlug", app.AuthGuard(app.GetProjectDetailsHandler))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.GetProjectDetailsHandler)))
 
 	router.HandlerFunc(http.MethodGet, "/api/notifications/user-settings", app.AuthGuard(app.GetUserNotificationsSettingsHandler))
 	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))
 
 	router.HandlerFunc(http.MethodGet, "/api/permissions", app.GetPermissionsHandler)
 
-	router.HandlerFunc(http.MethodPatch, "/api/workspaces/:id/roles", app.AuthGuard(app.UpdateRolePermissionHandler))
+	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/roles", app.AuthGuard(app.AuthorizeGuard(app.CreateNewRoleHandler)))
+	router.HandlerFunc(http.MethodPatch, "/api/workspaces/:id/roles", app.AuthGuard(app.AuthorizeGuard(app.UpdateRolePermissionHandler)))
 
 	handler := crs.Handler(router)
 	return &handler

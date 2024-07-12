@@ -233,6 +233,7 @@ const (
 	WorkspacesService_UpdateRolePermission_FullMethodName      = "/protos.WorkspacesService/UpdateRolePermission"
 	WorkspacesService_GetUserRoleInWorkspace_FullMethodName    = "/protos.WorkspacesService/GetUserRoleInWorkspace"
 	WorkspacesService_CheckRoleValidForResource_FullMethodName = "/protos.WorkspacesService/CheckRoleValidForResource"
+	WorkspacesService_CreateNewRole_FullMethodName             = "/protos.WorkspacesService/CreateNewRole"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -252,6 +253,7 @@ type WorkspacesServiceClient interface {
 	UpdateRolePermission(ctx context.Context, in *UpdateRolePermissionRequest, opts ...grpc.CallOption) (*UpdateRolePermissionResponse, error)
 	GetUserRoleInWorkspace(ctx context.Context, in *GetUserRoleInWorkspaceRequest, opts ...grpc.CallOption) (*GetUserRoleInWorkspaceResponse, error)
 	CheckRoleValidForResource(ctx context.Context, in *CheckRoleValidForResourceRequest, opts ...grpc.CallOption) (*CheckRoleValidForResourceResponse, error)
+	CreateNewRole(ctx context.Context, in *CreateNewRoleRequest, opts ...grpc.CallOption) (*CreateNewRoleResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -379,6 +381,15 @@ func (c *workspacesServiceClient) CheckRoleValidForResource(ctx context.Context,
 	return out, nil
 }
 
+func (c *workspacesServiceClient) CreateNewRole(ctx context.Context, in *CreateNewRoleRequest, opts ...grpc.CallOption) (*CreateNewRoleResponse, error) {
+	out := new(CreateNewRoleResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_CreateNewRole_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
@@ -396,6 +407,7 @@ type WorkspacesServiceServer interface {
 	UpdateRolePermission(context.Context, *UpdateRolePermissionRequest) (*UpdateRolePermissionResponse, error)
 	GetUserRoleInWorkspace(context.Context, *GetUserRoleInWorkspaceRequest) (*GetUserRoleInWorkspaceResponse, error)
 	CheckRoleValidForResource(context.Context, *CheckRoleValidForResourceRequest) (*CheckRoleValidForResourceResponse, error)
+	CreateNewRole(context.Context, *CreateNewRoleRequest) (*CreateNewRoleResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -441,6 +453,9 @@ func (UnimplementedWorkspacesServiceServer) GetUserRoleInWorkspace(context.Conte
 }
 func (UnimplementedWorkspacesServiceServer) CheckRoleValidForResource(context.Context, *CheckRoleValidForResourceRequest) (*CheckRoleValidForResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckRoleValidForResource not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) CreateNewRole(context.Context, *CreateNewRoleRequest) (*CreateNewRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNewRole not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -689,6 +704,24 @@ func _WorkspacesService_CheckRoleValidForResource_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_CreateNewRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNewRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).CreateNewRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_CreateNewRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).CreateNewRole(ctx, req.(*CreateNewRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -747,6 +780,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckRoleValidForResource",
 			Handler:    _WorkspacesService_CheckRoleValidForResource_Handler,
+		},
+		{
+			MethodName: "CreateNewRole",
+			Handler:    _WorkspacesService_CreateNewRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
