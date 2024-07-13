@@ -71,10 +71,13 @@ func (s *server) GetRoleIdOfUserWorkspaces(ctx context.Context, in *pb.GetRoleId
 }
 
 func (s *server) CheckRoleValidForResource(ctx context.Context, in *pb.CheckRoleValidForResourceRequest) (*pb.CheckRoleValidForResourceResponse, error) {
-
 	return s.WorkspaceModel.CheckRoleValidForResource(ctx, in)
 }
 
 func (s *server) CreateNewRole(ctx context.Context, in *pb.CreateNewRoleRequest) (*pb.CreateNewRoleResponse, error) {
 	return s.WorkspaceModel.CreateNewRole(ctx, in)
+}
+
+func (s *server) GetWorkspaceMembers(ctx context.Context, in *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
+	return s.WorkspaceModel.GetWorkspaceMembers(ctx, in)
 }

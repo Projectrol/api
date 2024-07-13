@@ -258,6 +258,23 @@ message CreateNewRoleResponse {
    int32 id = 1;
 }
 
+message GetWorkspaceMembersRequest {
+    int32 id = 1;
+}
+
+message WorkspaceMember {
+    int32 id = 1;
+    string email  = 2;
+    string name = 3;
+    string avatar = 4;
+    string phone_no = 5;
+    int32 role_id = 6;
+}
+
+message GetWorkspaceMembersResponse {
+    repeated WorkspaceMember members = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -280,6 +297,7 @@ service WorkspacesService {
     rpc GetUserRoleInWorkspace(GetUserRoleInWorkspaceRequest) returns(GetUserRoleInWorkspaceResponse);
     rpc CheckRoleValidForResource(CheckRoleValidForResourceRequest) returns(CheckRoleValidForResourceResponse);
     rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
+    rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
 }
 
 service NotificationsService {  

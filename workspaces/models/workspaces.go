@@ -9,6 +9,8 @@ import (
 
 	common "github.com/lehoangvuvt/projectrol/common"
 	pb "github.com/lehoangvuvt/projectrol/common/protos"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Workspace struct {
@@ -89,7 +91,8 @@ func (m *WorkspaceModel) Insert(ctx context.Context, input *pb.CreateWorkspaceRe
 			}
 		case 1:
 			roleName = "Admin"
-			rows, err := m.DB.Query("SELECT id FROM permissions WHERE resource_tag != 'workspaces' ORDER BY created_at ASC")
+			rows, err := m.DB.Query(`SELECT id FROM permissions 
+									WHERE resource_tag != 'workspaces' AND resource_tag != 'roles' ORDER BY created_at ASC`)
 			if err == nil {
 				for rows.Next() {
 					var permissionId int
@@ -353,7 +356,6 @@ func (m *WorkspaceModel) CheckRoleValidForResource(ctx context.Context, in *pb.C
 							ON permissions.id = role_permissions.permission_id 
 							WHERE role_permissions.role_id = %d AND %s = 'true' AND resource_tag = '%s'`, roleId, permissionType, resourceTag)
 	var count int
-	log.Print(queryStr)
 	err := m.DB.QueryRow(queryStr).Scan(&count)
 	if err != nil || count == 0 {
 		return &pb.CheckRoleValidForResourceResponse{IsValid: false}, nil
@@ -387,4 +389,48 @@ func (m *WorkspaceModel) CreateNewRole(ctx context.Context, in *pb.CreateNewRole
 	}
 
 	return &pb.CreateNewRoleResponse{Id: int32(roleId)}, nil
+}
+
+func (m *WorkspaceModel) GetWorkspaceMembers(ctx context.Context, in *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
+	conn, err := grpc.NewClient("localhost:3000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, errors.New("cannot connect to users gRPC server")
+	}
+	c := pb.NewUsersServiceClient(conn)
+	rows, err := m.DB.Query(`SELECT user_id, role_id FROM workspace_members WHERE workspace_id = $1`, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	var wsMembers []*pb.WorkspaceMember
+	var userIds []int
+	var roleIds []int
+	for rows.Next() {
+		var userId int
+		var roleId int
+		err = rows.Scan(&userId, &roleId)
+		if err == nil {
+			userIds = append(userIds, userId)
+			roleIds = append(roleIds, roleId)
+		}
+	}
+
+	for index, id := range userIds {
+		wsMember := &pb.WorkspaceMember{}
+		request := &pb.GetUserByIdRequest{
+			UserId: int32(id),
+		}
+		response, err := c.GetUserById(ctx, request)
+
+		if err == nil {
+			wsMember.Id = response.Id
+			wsMember.Email = response.Email
+			wsMember.Name = response.Settings.Name
+			wsMember.Avatar = response.Settings.Avatar
+			wsMember.PhoneNo = response.Settings.PhoneNo
+			wsMember.RoleId = int32(roleIds[index])
+			wsMembers = append(wsMembers, wsMember)
+		}
+	}
+
+	return &pb.GetWorkspaceMembersResponse{Members: wsMembers}, nil
 }

@@ -530,3 +530,28 @@ func (app *application) GetUserRoleInWorkspaceHandler(w http.ResponseWriter, r *
 	}
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"role": response.Role})
 }
+
+func (app *application) GetWorkspaceMembersHandler(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	worksapceId, err := strconv.Atoi(params.ByName("id"))
+	if err != nil || worksapceId < 0 {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid workspace id"})
+		return
+	}
+	request := &pb.GetWorkspaceMembersRequest{
+		Id: int32(worksapceId),
+	}
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	c := pb.NewWorkspacesServiceClient(conn)
+	response, err := c.GetWorkspaceMembers(context.Background(), request)
+	if err != nil {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": err.Error()})
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"members": response.Members})
+}
