@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS projects (
     description text NOT NULL,
     dtstart timestamp,
     dtend timestamp,
+    is_private boolean DEFAULT FALSE,
     created_by serial NOT NULL,
     created_at timestamp NOT NULL DEFAULT(NOW() at time zone 'utc'),
     updated_at timestamp,

@@ -115,6 +115,7 @@ message CreateProjectRequest {
     string description = 5;
 	int64 dtstart = 6;
     int64 dtend = 7;
+    repeated int32 memberIds = 8;
 }
 
 message CreateProjectResponse {

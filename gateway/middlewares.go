@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -48,7 +47,7 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 		resourceTag := strings.Split((strings.Split(r.URL.Path, "/api/workspaces/")[1]), "/")[1]
 		workspaceId, _ := strconv.Atoi(httprouter.ParamsFromContext(r.Context()).ByName("id"))
 		method := r.Method
-		log.Print(method)
+
 		cookieValue, err := r.Cookie("access_token")
 		if err != nil {
 			common.WriteJSON(w, http.StatusUnauthorized, common.Envelop{"error": "unauthorized user"})
@@ -84,6 +83,24 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		c := pb.NewWorkspacesServiceClient(conn)
+
+		if resourceTag == "projects" {
+			projectSlug := httprouter.ParamsFromContext(r.Context()).ByName("projectSlug")
+			if projectSlug != "" {
+				response, err := c.CheckRoleValidForResource(context.Background(), &pb.CheckRoleValidForResourceRequest{
+					RoleId:      int32(roleId),
+					ResourceTag: resourceTag,
+					Method:      method,
+				})
+				if err != nil || !response.IsValid {
+					common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
+					return
+				}
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+
 		response, err := c.CheckRoleValidForResource(context.Background(), &pb.CheckRoleValidForResourceRequest{
 			RoleId:      int32(roleId),
 			ResourceTag: resourceTag,
@@ -94,6 +111,7 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 			common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
 			return
 		}
+
 		next.ServeHTTP(w, r)
 	})
 }
