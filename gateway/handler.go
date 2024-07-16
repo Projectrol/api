@@ -257,6 +257,7 @@ func (app *application) CreateProjectHandler(w http.ResponseWriter, r *http.Requ
 		Description: body.Description,
 		Dtstart:     body.Dtstart,
 		Dtend:       body.Dtend,
+		IsPrivate:   body.IsPrivate,
 	}
 	ctx := context.Background()
 	res, err := client.CreateProject(ctx, request)

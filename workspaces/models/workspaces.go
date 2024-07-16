@@ -434,3 +434,22 @@ func (m *WorkspaceModel) GetWorkspaceMembers(ctx context.Context, in *pb.GetWork
 
 	return &pb.GetWorkspaceMembersResponse{Members: wsMembers}, nil
 }
+
+func (m *WorkspaceModel) CheckUserHasAccessToProject(ctx context.Context, in *pb.CheckUserHasAccessToProjectRequest) (*pb.CheckRoleValidForResourceResponse, error) {
+	var projectId int
+	var isPrivate bool
+	err := m.DB.QueryRow("SELECT id, is_private FROM projects WHERE slug = $1", in.ProjectSlug).Scan(&projectId, &isPrivate)
+	if err != nil {
+		return nil, err
+	}
+	if !isPrivate {
+		return &pb.CheckRoleValidForResourceResponse{IsValid: true}, nil
+	}
+	var count int
+	err = m.DB.QueryRow(`SELECT COUNT(*) FROM projects_members WHERE 
+					project_id = $1 AND member_id = $2`, projectId, in.UserId).Scan(&count)
+	if err != nil || count == 0 {
+		return nil, err
+	}
+	return &pb.CheckRoleValidForResourceResponse{IsValid: true}, nil
+}

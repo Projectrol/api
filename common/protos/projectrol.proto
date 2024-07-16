@@ -115,7 +115,7 @@ message CreateProjectRequest {
     string description = 5;
 	int64 dtstart = 6;
     int64 dtend = 7;
-    repeated int32 memberIds = 8;
+    bool is_private = 8;
 }
 
 message CreateProjectResponse {
@@ -276,6 +276,11 @@ message GetWorkspaceMembersResponse {
     repeated WorkspaceMember members = 1;
 }
 
+message CheckUserHasAccessToProjectRequest {
+    int32 user_id = 1;
+    string project_slug = 2;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -297,6 +302,7 @@ service WorkspacesService {
     rpc UpdateRolePermission(UpdateRolePermissionRequest) returns(UpdateRolePermissionResponse);
     rpc GetUserRoleInWorkspace(GetUserRoleInWorkspaceRequest) returns(GetUserRoleInWorkspaceResponse);
     rpc CheckRoleValidForResource(CheckRoleValidForResourceRequest) returns(CheckRoleValidForResourceResponse);
+    rpc CheckUserHasAccessToProject(CheckUserHasAccessToProjectRequest) returns(CheckRoleValidForResourceResponse);
     rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
     rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
 }

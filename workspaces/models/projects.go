@@ -22,6 +22,7 @@ type CreateProjectInput struct {
 	Description string `json:"description"`
 	Dtstart     int64  `json:"dtstart"`
 	Dtend       int64  `json:"dtend"`
+	IsPrivate   bool   `json:"is_private"`
 }
 
 func NewProjectsModel(DB *sql.DB) *ProjectsModel {
@@ -37,8 +38,8 @@ func (m *ProjectsModel) CreateProject(ctx context.Context, in *pb.CreateProjectR
 	dtEnd, _ := strconv.ParseInt(fmt.Sprintf("%d", in.Dtend), 10, 64)
 	dtEndTime := time.Unix(dtEnd, 0).UTC()
 	var id int32
-	err := m.DB.QueryRow(`INSERT INTO projects(workspace_id, created_by, slug, name, summary, description, dtstart, dtend) 
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ID`,
+	err := m.DB.QueryRow(`INSERT INTO projects(workspace_id, created_by, slug, name, summary, description, dtstart, dtend, is_private) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ID`,
 		in.WorkspaceId,
 		in.CreatedBy,
 		slug,
@@ -47,10 +48,15 @@ func (m *ProjectsModel) CreateProject(ctx context.Context, in *pb.CreateProjectR
 		in.Description,
 		dtstartTime,
 		dtEndTime,
+		in.IsPrivate,
 	).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
+	m.DB.Exec(`INSERT INTO projects_members(member_id, project_id) VALUES($1, $2)`,
+		in.CreatedBy,
+		id,
+	)
 	return &pb.CreateProjectResponse{Id: id}, nil
 }
 

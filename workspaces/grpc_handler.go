@@ -81,3 +81,7 @@ func (s *server) CreateNewRole(ctx context.Context, in *pb.CreateNewRoleRequest)
 func (s *server) GetWorkspaceMembers(ctx context.Context, in *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
 	return s.WorkspaceModel.GetWorkspaceMembers(ctx, in)
 }
+
+func (s *server) CheckUserHasAccessToProject(ctx context.Context, in *pb.CheckUserHasAccessToProjectRequest) (*pb.CheckRoleValidForResourceResponse, error) {
+	return s.WorkspaceModel.CheckUserHasAccessToProject(ctx, in)
+}
