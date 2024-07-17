@@ -87,22 +87,13 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 		if resourceTag == "projects" {
 			projectSlug := httprouter.ParamsFromContext(r.Context()).ByName("projectSlug")
 			if projectSlug != "" {
-				response, err := c.CheckRoleValidForResource(context.Background(), &pb.CheckRoleValidForResourceRequest{
-					RoleId:      int32(roleId),
-					ResourceTag: resourceTag,
-					Method:      method,
-				})
-				if err != nil || !response.IsValid {
-					common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
-					return
-				}
 				userId := -1
 				for k, v := range claims {
 					if k == "sub" {
 						userId = int(v.(float64))
 					}
 				}
-				response, err = c.CheckUserHasAccessToProject(context.Background(), &pb.CheckUserHasAccessToProjectRequest{UserId: int32(userId),
+				response, err := c.CheckUserHasAccessToProject(context.Background(), &pb.CheckUserHasAccessToProjectRequest{UserId: int32(userId),
 					ProjectSlug: projectSlug})
 				if err != nil || !response.IsValid {
 					common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})

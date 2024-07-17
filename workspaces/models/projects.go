@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -63,8 +64,11 @@ func (m *ProjectsModel) CreateProject(ctx context.Context, in *pb.CreateProjectR
 func (m *ProjectsModel) GetProjectsByWorkspaceId(ctx context.Context, in *pb.GetProjectsByWorkspaceIdRequest) (*pb.GetProjectsByWorkspaceIdResponse, error) {
 	var projects []*pb.Project
 
-	rows, err := m.DB.Query(`SELECT id, workspace_id, created_by, name, slug, description, dtstart, dtend, created_at 
-							FROM projects WHERE workspace_id = $1 `, in.WorkspaceId)
+	rows, err := m.DB.Query(`SELECT P.id, P.workspace_id, P.created_by, P.name, P.slug, P.description, P.dtstart, P.dtend, P.created_at 
+							FROM projects_members PM
+							LEFT JOIN projects P ON PM.project_id = P.id
+							WHERE (workspace_id = $1 AND PM.member_id = $2 AND P.is_private = true) 
+							OR (workspace_id = $1 AND P.is_private = false)`, in.WorkspaceId, in.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +78,12 @@ func (m *ProjectsModel) GetProjectsByWorkspaceId(ctx context.Context, in *pb.Get
 		err = rows.Scan(&project.Id, &project.WorkspaceId, &project.CreatedBy,
 			&project.Name, &project.Slug, &project.Description, &project.Dtstart, &project.Dtend, &project.CreatedAt)
 		if err == nil {
+			log.Print(2)
 			projects = append(projects, project)
+		} else {
+			log.Print(err.Error())
 		}
 	}
-
 	return &pb.GetProjectsByWorkspaceIdResponse{Projects: projects}, nil
 }
 
