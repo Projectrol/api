@@ -298,7 +298,7 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 		common.WriteJSON(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	common.WriteJSON(w, http.StatusCreated, common.Envelop{"projects": res.Projects})
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"projects": res.Projects})
 }
 
 func (app *application) GetWorkspaceDetailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -333,7 +333,6 @@ func (app *application) GetWorkspaceDetailsHandler(w http.ResponseWriter, r *htt
 
 func (app *application) GetProjectDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
-	workspaceSlug := params.ByName("workspaceSlug")
 	projectSlug := params.ByName("projectSlug")
 	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -344,9 +343,8 @@ func (app *application) GetProjectDetailsHandler(w http.ResponseWriter, r *http.
 	client := pb.NewWorkspacesServiceClient(conn)
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 	request := &pb.GetProjectDetailsRequest{
-		WorkspaceSlug: workspaceSlug,
-		ProjectSlug:   projectSlug,
-		UserId:        int32(userId),
+		ProjectSlug: projectSlug,
+		UserId:      int32(userId),
 	}
 	response, err := client.GetProjectDetails(context.Background(), request)
 	if err != nil {
@@ -354,7 +352,7 @@ func (app *application) GetProjectDetailsHandler(w http.ResponseWriter, r *http.
 		common.WriteJSON(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	common.WriteJSON(w, http.StatusOK, common.Envelop{"project": response.Project})
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response.Details})
 }
 
 func (app *application) GetUserNotificationsSettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -555,4 +553,28 @@ func (app *application) GetWorkspaceMembersHandler(w http.ResponseWriter, r *htt
 		return
 	}
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"members": response.Members})
+}
+
+func (app *application) DeleteProjectHandler(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	projectSlug := params.ByName("projectSlug")
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewWorkspacesServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+	request := &pb.GetProjectDetailsRequest{
+		ProjectSlug: projectSlug,
+		UserId:      int32(userId),
+	}
+	response, err := client.GetProjectDetails(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response.Details})
 }

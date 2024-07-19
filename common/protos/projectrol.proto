@@ -107,6 +107,11 @@ message Project {
     string created_at = 10;
 }
 
+message ProjectDetails {
+    Project project = 1;
+    repeated int32 memberIds = 2; 
+}
+
 message CreateProjectRequest {
 	int32 workspace_id = 1;
     int32 created_by = 2;
@@ -132,13 +137,12 @@ message GetProjectsByWorkspaceIdResponse {
 }
 
 message GetProjectDetailsRequest {
-    string workspace_slug = 1;
     string project_slug = 2;
     int32 user_id = 3;
 }
 
 message GetProjectDetailsResponse {
-    Project project = 1;
+    ProjectDetails details = 1;
 }
 
 message UserNotificationsSettings {

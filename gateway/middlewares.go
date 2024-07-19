@@ -93,14 +93,26 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 						userId = int(v.(float64))
 					}
 				}
-				response, err := c.CheckUserHasAccessToProject(context.Background(), &pb.CheckUserHasAccessToProjectRequest{UserId: int32(userId),
-					ProjectSlug: projectSlug})
-				if err != nil || !response.IsValid {
-					common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
+				switch method {
+				case "GET":
+					response, err := c.CheckUserHasAccessToProject(context.Background(), &pb.CheckUserHasAccessToProjectRequest{UserId: int32(userId),
+						ProjectSlug: projectSlug})
+					if err != nil || !response.IsValid {
+						common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
+						return
+					}
+					next.ServeHTTP(w, r)
+					return
+				case "DELETE":
+					response, err := c.GetProjectDetails(context.Background(), &pb.GetProjectDetailsRequest{UserId: int32(userId),
+						ProjectSlug: projectSlug})
+					if err != nil || response.Details.Project.CreatedBy != int32(userId) {
+						common.WriteJSON(w, http.StatusForbidden, common.Envelop{"error": "user don't have permission to access this resource"})
+						return
+					}
+					next.ServeHTTP(w, r)
 					return
 				}
-				next.ServeHTTP(w, r)
-				return
 			}
 		}
 

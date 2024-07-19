@@ -88,6 +88,7 @@ func (m *ProjectsModel) GetProjectsByWorkspaceId(ctx context.Context, in *pb.Get
 }
 
 func (m *ProjectsModel) GetProjectDetails(ctx context.Context, in *pb.GetProjectDetailsRequest) (*pb.GetProjectDetailsResponse, error) {
+	details := &pb.ProjectDetails{}
 	project := &pb.Project{}
 	err := m.DB.QueryRow(`SELECT id, workspace_id, created_by, name, slug, summary, description, dtstart, dtend, created_at 
 					FROM projects WHERE slug = $1`, in.ProjectSlug).
@@ -97,5 +98,18 @@ func (m *ProjectsModel) GetProjectDetails(ctx context.Context, in *pb.GetProject
 	if err != nil {
 		return nil, err
 	}
-	return &pb.GetProjectDetailsResponse{Project: project}, nil
+	details.Project = project
+	rows, err := m.DB.Query("SELECT id from projects_members WHERE project_id = $1", project.Id)
+	var memberIds []int32
+	if err == nil {
+		for rows.Next() {
+			var memberId int32
+			err = rows.Scan(&memberId)
+			if err == nil {
+				memberIds = append(memberIds, memberId)
+			}
+		}
+		details.MemberIds = memberIds
+	}
+	return &pb.GetProjectDetailsResponse{Details: details}, nil
 }

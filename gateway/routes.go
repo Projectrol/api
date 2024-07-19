@@ -33,6 +33,7 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/projects/create", app.AuthGuard(app.AuthorizeGuard(app.CreateProjectHandler)))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/projects/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.GetProjectDetailsHandler)))
+	router.HandlerFunc(http.MethodDelete, "/api/workspaces/:id/projects/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.DeleteProjectHandler)))
 
 	router.HandlerFunc(http.MethodGet, "/api/notifications/user-settings", app.AuthGuard(app.GetUserNotificationsSettingsHandler))
 	router.HandlerFunc(http.MethodPatch, "/api/notifications/user-settings", app.AuthGuard(app.UpdateUserNotificationsSettingsHandler))
