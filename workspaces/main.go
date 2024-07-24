@@ -44,6 +44,7 @@ func main() {
 		WorkspaceModel:     models.NewWorkspaceModel(db),
 		CalendarEventModel: models.NewCalendarEventModel(db),
 		ProjectModel:       models.NewProjectsModel(db),
+		TaskModel:          models.NewTaskModel(db),
 	}
 	pb.RegisterWorkspacesServiceServer(grpcServer, server)
 	log.Printf("Start gRPC server on address %s", "localhost:3001")

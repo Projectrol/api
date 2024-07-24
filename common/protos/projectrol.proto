@@ -285,6 +285,31 @@ message CheckUserHasAccessToProjectRequest {
     string project_slug = 2;
 }
 
+message Task {
+    string nanoid = 1;
+    int32 project_id = 2;
+    string title = 3;
+    string description = 4;
+    string status = 5;
+    string label = 6;
+    bool is_published = 7;    
+    string created_at = 8;
+}
+
+message CreateTaskRequest {
+    int32 user_id = 1;
+    int32 project_id = 2;
+    string title = 3;
+    string description = 4;
+    string status = 5;
+    string label = 6;
+    bool is_published = 7;
+}
+
+message CreateTaskResponse {
+    string nanoid = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -309,6 +334,7 @@ service WorkspacesService {
     rpc CheckUserHasAccessToProject(CheckUserHasAccessToProjectRequest) returns(CheckRoleValidForResourceResponse);
     rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
     rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
+    rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
 }
 
 service NotificationsService {  

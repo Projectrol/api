@@ -45,6 +45,8 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/members", app.AuthGuard(app.AuthorizeGuard(app.GetWorkspaceMembersHandler)))
 
+	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/tasks", app.AuthGuard(app.AuthorizeGuard(app.UpdateRolePermissionHandler)))
+
 	handler := crs.Handler(router)
 	return &handler
 }

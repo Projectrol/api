@@ -578,3 +578,41 @@ func (app *application) DeleteProjectHandler(w http.ResponseWriter, r *http.Requ
 	}
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response.Details})
 }
+
+func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	client := pb.NewWorkspacesServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+
+	var input wsModels.CreateTaskInput
+	err = common.ReadJSON(r, input)
+
+	if err != nil {
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid body format"})
+		return
+	}
+
+	request := &pb.CreateTaskRequest{
+		UserId:      int32(userId),
+		ProjectId:   int32(input.ProjectId),
+		Title:       input.Title,
+		Description: input.Description,
+		Status:      input.Status,
+		Label:       input.Label,
+		IsPublished: input.IsPublished,
+	}
+
+	response, err := client.CreateTask(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"nanoid": response.Nanoid})
+}

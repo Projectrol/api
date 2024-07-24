@@ -236,6 +236,7 @@ const (
 	WorkspacesService_CheckUserHasAccessToProject_FullMethodName = "/protos.WorkspacesService/CheckUserHasAccessToProject"
 	WorkspacesService_CreateNewRole_FullMethodName               = "/protos.WorkspacesService/CreateNewRole"
 	WorkspacesService_GetWorkspaceMembers_FullMethodName         = "/protos.WorkspacesService/GetWorkspaceMembers"
+	WorkspacesService_CreateTask_FullMethodName                  = "/protos.WorkspacesService/CreateTask"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -258,6 +259,7 @@ type WorkspacesServiceClient interface {
 	CheckUserHasAccessToProject(ctx context.Context, in *CheckUserHasAccessToProjectRequest, opts ...grpc.CallOption) (*CheckRoleValidForResourceResponse, error)
 	CreateNewRole(ctx context.Context, in *CreateNewRoleRequest, opts ...grpc.CallOption) (*CreateNewRoleResponse, error)
 	GetWorkspaceMembers(ctx context.Context, in *GetWorkspaceMembersRequest, opts ...grpc.CallOption) (*GetWorkspaceMembersResponse, error)
+	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -412,6 +414,15 @@ func (c *workspacesServiceClient) GetWorkspaceMembers(ctx context.Context, in *G
 	return out, nil
 }
 
+func (c *workspacesServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
+	out := new(CreateTaskResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_CreateTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
@@ -432,6 +443,7 @@ type WorkspacesServiceServer interface {
 	CheckUserHasAccessToProject(context.Context, *CheckUserHasAccessToProjectRequest) (*CheckRoleValidForResourceResponse, error)
 	CreateNewRole(context.Context, *CreateNewRoleRequest) (*CreateNewRoleResponse, error)
 	GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error)
+	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -486,6 +498,9 @@ func (UnimplementedWorkspacesServiceServer) CreateNewRole(context.Context, *Crea
 }
 func (UnimplementedWorkspacesServiceServer) GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkspaceMembers not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -788,6 +803,24 @@ func _WorkspacesService_GetWorkspaceMembers_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).CreateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_CreateTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -858,6 +891,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkspaceMembers",
 			Handler:    _WorkspacesService_GetWorkspaceMembers_Handler,
+		},
+		{
+			MethodName: "CreateTask",
+			Handler:    _WorkspacesService_CreateTask_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

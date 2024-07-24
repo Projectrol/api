@@ -12,6 +12,7 @@ type server struct {
 	WorkspaceModel     *models.WorkspaceModel
 	CalendarEventModel *models.CalendarEventModel
 	ProjectModel       *models.ProjectsModel
+	TaskModel          *models.TaskModel
 }
 
 func (s *server) CreateWorkspace(ctx context.Context, in *pb.CreateWorkspaceRequest) (*pb.CreateWorkspaceResponse, error) {
@@ -30,7 +31,7 @@ func (s *server) GetWorkspacesByUserId(ctx context.Context, in *pb.GetWorkspaces
 	return s.WorkspaceModel.GetWorkspacesByUserId(ctx, in.UserId)
 }
 
-func (s *server) CreateTask(ctx context.Context, in *pb.CreateCalendarEventRequest) (*pb.CreateCalendarEventResponse, error) {
+func (s *server) CreateCalendarEvent(ctx context.Context, in *pb.CreateCalendarEventRequest) (*pb.CreateCalendarEventResponse, error) {
 	return s.CalendarEventModel.Insert(ctx, in)
 }
 
@@ -84,4 +85,8 @@ func (s *server) GetWorkspaceMembers(ctx context.Context, in *pb.GetWorkspaceMem
 
 func (s *server) CheckUserHasAccessToProject(ctx context.Context, in *pb.CheckUserHasAccessToProjectRequest) (*pb.CheckRoleValidForResourceResponse, error) {
 	return s.WorkspaceModel.CheckUserHasAccessToProject(ctx, in)
+}
+
+func (s *server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
+	return s.TaskModel.CreateTask(ctx, in)
 }
