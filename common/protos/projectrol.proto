@@ -298,7 +298,7 @@ message Task {
 
 message CreateTaskRequest {
     int32 user_id = 1;
-    int32 project_id = 2;
+    string project_slug = 2;
     string title = 3;
     string description = 4;
     string status = 5;
@@ -308,6 +308,15 @@ message CreateTaskRequest {
 
 message CreateTaskResponse {
     string nanoid = 1;
+}   
+
+message GetProjectTasksRequest {
+    int32 user_id = 1;
+    string project_slug = 2;
+}
+
+message GetProjectTasksResponse {
+    repeated Task tasks = 1;
 }
 
 service UsersService {
@@ -335,6 +344,7 @@ service WorkspacesService {
     rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
     rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
     rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
+    rpc GetProjectTasks(GetProjectTasksRequest) returns(GetProjectTasksResponse);
 }
 
 service NotificationsService {  

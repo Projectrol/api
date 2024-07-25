@@ -90,3 +90,7 @@ func (s *server) CheckUserHasAccessToProject(ctx context.Context, in *pb.CheckUs
 func (s *server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	return s.TaskModel.CreateTask(ctx, in)
 }
+
+func (s *server) GetProjectTasks(ctx context.Context, in *pb.GetProjectTasksRequest) (*pb.GetProjectTasksResponse, error) {
+	return s.TaskModel.GetProjectTasks(ctx, in)
+}

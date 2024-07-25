@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -589,17 +590,18 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 	client := pb.NewWorkspacesServiceClient(conn)
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
 
-	var input wsModels.CreateTaskInput
+	input := &wsModels.CreateTaskInput{}
 	err = common.ReadJSON(r, input)
 
 	if err != nil {
+		log.Print(err)
 		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid body format"})
 		return
 	}
 
 	request := &pb.CreateTaskRequest{
 		UserId:      int32(userId),
-		ProjectId:   int32(input.ProjectId),
+		ProjectSlug: input.ProjectSlug,
 		Title:       input.Title,
 		Description: input.Description,
 		Status:      input.Status,
@@ -615,4 +617,36 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"nanoid": response.Nanoid})
+}
+
+func (app *application) GetProjectTasksHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+	projectSlug := httprouter.ParamsFromContext(r.Context()).ByName("projectSlug")
+	client := pb.NewWorkspacesServiceClient(conn)
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+
+	if err != nil {
+		log.Print(err)
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid body format"})
+		return
+	}
+
+	request := &pb.GetProjectTasksRequest{
+		UserId:      int32(userId),
+		ProjectSlug: projectSlug,
+	}
+
+	response, err := client.GetProjectTasks(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"tasks": response.Tasks})
 }
