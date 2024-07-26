@@ -303,7 +303,8 @@ message CreateTaskRequest {
     string description = 4;
     string status = 5;
     string label = 6;
-    bool is_published = 7;
+    int32 priority = 7;
+    bool is_published = 8;
 }
 
 message CreateTaskResponse {

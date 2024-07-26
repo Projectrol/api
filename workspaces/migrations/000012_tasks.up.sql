@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS tasks (
     status text NOT NULL,
     label text NOT NULL,
     is_published boolean,
+    task_priority integer,
+    task_order integer,
     created_at timestamp DEFAULT(NOW() at time zone 'utc'),
     updated_at timestamp,
     created_by serial NOT NULL,

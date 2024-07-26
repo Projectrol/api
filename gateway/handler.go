@@ -606,6 +606,7 @@ func (app *application) CreateTaskHandler(w http.ResponseWriter, r *http.Request
 		Description: input.Description,
 		Status:      input.Status,
 		Label:       input.Label,
+		Priority:    input.Priority,
 		IsPublished: input.IsPublished,
 	}
 

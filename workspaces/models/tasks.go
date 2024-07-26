@@ -19,6 +19,7 @@ type CreateTaskInput struct {
 	Description string `json:"description"`
 	Status      string `json:"status"`
 	Label       string `json:"label"`
+	Priority    int32  `json:"priority"`
 	IsPublished bool   `json:"is_published"`
 }
 
@@ -33,9 +34,9 @@ func (m *TaskModel) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	_, err = m.DB.Exec(`INSERT INTO tasks (nanoid, project_id, title, description, status, label, is_published, created_by) 
-					VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,
-		nanoid, projectId, in.Title, in.Description, in.Status, in.Label, in.IsPublished, in.UserId)
+	_, err = m.DB.Exec(`INSERT INTO tasks (nanoid, project_id, title, description, status, label, task_priority, is_published, created_by) 
+					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		nanoid, projectId, in.Title, in.Description, in.Status, in.Label, in.Priority, in.IsPublished, in.UserId)
 	if err != nil {
 		return nil, err
 	}

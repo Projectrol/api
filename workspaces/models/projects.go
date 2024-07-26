@@ -99,7 +99,7 @@ func (m *ProjectsModel) GetProjectDetails(ctx context.Context, in *pb.GetProject
 		return nil, err
 	}
 	details.Project = project
-	rows, err := m.DB.Query("SELECT id from projects_members WHERE project_id = $1", project.Id)
+	rows, err := m.DB.Query("SELECT member_id from projects_members WHERE project_id = $1", project.Id)
 	var memberIds []int32
 	if err == nil {
 		for rows.Next() {
