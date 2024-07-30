@@ -320,6 +320,63 @@ message GetProjectTasksResponse {
     repeated Task tasks = 1;
 }
 
+message CreateProjectDocumentRequest {
+    int32 user_id = 1;
+    string project_slug = 2;
+    string name = 3;
+    string content = 4;
+}
+
+message CreateProjectDocumentResponse {
+    string nanoid = 1;
+}
+
+message GetProjectDocumentsRequest {
+    string project_slug = 1;
+}
+
+message ProjectDocument {
+    int32 created_by = 1;
+    int32 updated_by = 2;
+    string nanoid = 3;
+    string name = 4;
+    string created_at = 5;
+    optional string updated_at = 6;
+}
+
+message ProjectDocumentDetails {
+    int32 created_by = 1;
+    int32 updated_by = 2;
+    string nanoid = 3;
+    string name = 4;
+    string content = 5;
+    string created_at = 6;
+    optional string updated_at = 7;
+}
+
+message GetProjectDocumentsResponse {
+    repeated ProjectDocument documents = 1;
+}
+
+message GetProjectDocumentDetailsRequest {
+    string nanoid = 1;
+}
+
+message GetProjectDocumentDetailsResponse {
+    ProjectDocumentDetails details = 1;
+}
+
+message UpdateProjectDocumentDetailsRequest {
+    string nanoid = 1;
+    int32 updated_by = 2;
+    string name = 3;
+    string content = 4;
+}
+
+message UpdateProjectDocumentDetailsResponse {
+    ProjectDocumentDetails details = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -346,6 +403,10 @@ service WorkspacesService {
     rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
     rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
     rpc GetProjectTasks(GetProjectTasksRequest) returns(GetProjectTasksResponse);
+    rpc CreateProjectDocument(CreateProjectDocumentRequest) returns(CreateProjectDocumentResponse);
+    rpc GetProjectDocuments(GetProjectDocumentsRequest) returns(GetProjectDocumentsResponse);
+    rpc GetProjectDocumentDetails(GetProjectDocumentDetailsRequest) returns(GetProjectDocumentDetailsResponse);
+    rpc UpdateProjectDocumentDetails(UpdateProjectDocumentDetailsRequest) returns(UpdateProjectDocumentDetailsResponse);
 }
 
 service NotificationsService {  

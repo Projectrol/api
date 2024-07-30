@@ -45,8 +45,13 @@ func (app *application) getRoutes() *http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/members", app.AuthGuard(app.AuthorizeGuard(app.GetWorkspaceMembersHandler)))
 
-	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/tasks", app.AuthGuard(app.AuthorizeGuard(app.CreateTaskHandler)))
+	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/tasks/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.CreateTaskHandler)))
 	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/tasks/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.GetProjectTasksHandler)))
+
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/documents/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.GetProjectDocumentsHandler)))
+	router.HandlerFunc(http.MethodPost, "/api/workspaces/:id/documents/:projectSlug", app.AuthGuard(app.AuthorizeGuard(app.CreateProjectDocumentHandler)))
+	router.HandlerFunc(http.MethodGet, "/api/workspaces/:id/documents/:projectSlug/:nanoid", app.AuthGuard(app.AuthorizeGuard(app.GetProjectDocumentDetailsHandler)))
+	router.HandlerFunc(http.MethodPatch, "/api/workspaces/:id/documents/:projectSlug/:nanoid", app.AuthGuard(app.AuthorizeGuard(app.UpdateProjectDocumentDetailsHandler)))
 
 	handler := crs.Handler(router)
 	return &handler

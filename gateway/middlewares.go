@@ -84,7 +84,11 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 
 		c := pb.NewWorkspacesServiceClient(conn)
 
-		if resourceTag == "projects" {
+		if resourceTag == "projects" || resourceTag == "documents" {
+			if resourceTag == "documents" {
+				resourceTag = "projects"
+				method = "GET"
+			}
 			projectSlug := httprouter.ParamsFromContext(r.Context()).ByName("projectSlug")
 			if projectSlug != "" {
 				userId := -1

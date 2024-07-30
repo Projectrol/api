@@ -94,3 +94,19 @@ func (s *server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.
 func (s *server) GetProjectTasks(ctx context.Context, in *pb.GetProjectTasksRequest) (*pb.GetProjectTasksResponse, error) {
 	return s.TaskModel.GetProjectTasks(ctx, in)
 }
+
+func (s *server) CreateProjectDocument(ctx context.Context, in *pb.CreateProjectDocumentRequest) (*pb.CreateProjectDocumentResponse, error) {
+	return s.ProjectModel.CreateProjectDocument(ctx, in)
+}
+
+func (s *server) GetProjectDocuments(ctx context.Context, in *pb.GetProjectDocumentsRequest) (*pb.GetProjectDocumentsResponse, error) {
+	return s.ProjectModel.GetProjectDocuments(ctx, in)
+}
+
+func (s *server) GetProjectDocumentDetails(ctx context.Context, in *pb.GetProjectDocumentDetailsRequest) (*pb.GetProjectDocumentDetailsResponse, error) {
+	return s.ProjectModel.GetProjectDocumentDetails(ctx, in)
+}
+
+func (s *server) UpdateProjectDocumentDetails(ctx context.Context, in *pb.UpdateProjectDocumentDetailsRequest) (*pb.UpdateProjectDocumentDetailsResponse, error) {
+	return s.ProjectModel.UpdateProjectDocumentDetails(ctx, in)
+}

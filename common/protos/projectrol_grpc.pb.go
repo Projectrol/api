@@ -220,24 +220,28 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	WorkspacesService_CreateWorkspace_FullMethodName             = "/protos.WorkspacesService/CreateWorkspace"
-	WorkspacesService_GetWorkspacesByUserId_FullMethodName       = "/protos.WorkspacesService/GetWorkspacesByUserId"
-	WorkspacesService_GetRoleIdOfUserWorkspaces_FullMethodName   = "/protos.WorkspacesService/GetRoleIdOfUserWorkspaces"
-	WorkspacesService_GetWorkspaceDetails_FullMethodName         = "/protos.WorkspacesService/GetWorkspaceDetails"
-	WorkspacesService_GetWorkspaceRoles_FullMethodName           = "/protos.WorkspacesService/GetWorkspaceRoles"
-	WorkspacesService_CreateCalendarEvent_FullMethodName         = "/protos.WorkspacesService/CreateCalendarEvent"
-	WorkspacesService_CreateProject_FullMethodName               = "/protos.WorkspacesService/CreateProject"
-	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName    = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
-	WorkspacesService_GetProjectDetails_FullMethodName           = "/protos.WorkspacesService/GetProjectDetails"
-	WorkspacesService_GetPermissions_FullMethodName              = "/protos.WorkspacesService/GetPermissions"
-	WorkspacesService_UpdateRolePermission_FullMethodName        = "/protos.WorkspacesService/UpdateRolePermission"
-	WorkspacesService_GetUserRoleInWorkspace_FullMethodName      = "/protos.WorkspacesService/GetUserRoleInWorkspace"
-	WorkspacesService_CheckRoleValidForResource_FullMethodName   = "/protos.WorkspacesService/CheckRoleValidForResource"
-	WorkspacesService_CheckUserHasAccessToProject_FullMethodName = "/protos.WorkspacesService/CheckUserHasAccessToProject"
-	WorkspacesService_CreateNewRole_FullMethodName               = "/protos.WorkspacesService/CreateNewRole"
-	WorkspacesService_GetWorkspaceMembers_FullMethodName         = "/protos.WorkspacesService/GetWorkspaceMembers"
-	WorkspacesService_CreateTask_FullMethodName                  = "/protos.WorkspacesService/CreateTask"
-	WorkspacesService_GetProjectTasks_FullMethodName             = "/protos.WorkspacesService/GetProjectTasks"
+	WorkspacesService_CreateWorkspace_FullMethodName              = "/protos.WorkspacesService/CreateWorkspace"
+	WorkspacesService_GetWorkspacesByUserId_FullMethodName        = "/protos.WorkspacesService/GetWorkspacesByUserId"
+	WorkspacesService_GetRoleIdOfUserWorkspaces_FullMethodName    = "/protos.WorkspacesService/GetRoleIdOfUserWorkspaces"
+	WorkspacesService_GetWorkspaceDetails_FullMethodName          = "/protos.WorkspacesService/GetWorkspaceDetails"
+	WorkspacesService_GetWorkspaceRoles_FullMethodName            = "/protos.WorkspacesService/GetWorkspaceRoles"
+	WorkspacesService_CreateCalendarEvent_FullMethodName          = "/protos.WorkspacesService/CreateCalendarEvent"
+	WorkspacesService_CreateProject_FullMethodName                = "/protos.WorkspacesService/CreateProject"
+	WorkspacesService_GetProjectsByWorkspaceId_FullMethodName     = "/protos.WorkspacesService/GetProjectsByWorkspaceId"
+	WorkspacesService_GetProjectDetails_FullMethodName            = "/protos.WorkspacesService/GetProjectDetails"
+	WorkspacesService_GetPermissions_FullMethodName               = "/protos.WorkspacesService/GetPermissions"
+	WorkspacesService_UpdateRolePermission_FullMethodName         = "/protos.WorkspacesService/UpdateRolePermission"
+	WorkspacesService_GetUserRoleInWorkspace_FullMethodName       = "/protos.WorkspacesService/GetUserRoleInWorkspace"
+	WorkspacesService_CheckRoleValidForResource_FullMethodName    = "/protos.WorkspacesService/CheckRoleValidForResource"
+	WorkspacesService_CheckUserHasAccessToProject_FullMethodName  = "/protos.WorkspacesService/CheckUserHasAccessToProject"
+	WorkspacesService_CreateNewRole_FullMethodName                = "/protos.WorkspacesService/CreateNewRole"
+	WorkspacesService_GetWorkspaceMembers_FullMethodName          = "/protos.WorkspacesService/GetWorkspaceMembers"
+	WorkspacesService_CreateTask_FullMethodName                   = "/protos.WorkspacesService/CreateTask"
+	WorkspacesService_GetProjectTasks_FullMethodName              = "/protos.WorkspacesService/GetProjectTasks"
+	WorkspacesService_CreateProjectDocument_FullMethodName        = "/protos.WorkspacesService/CreateProjectDocument"
+	WorkspacesService_GetProjectDocuments_FullMethodName          = "/protos.WorkspacesService/GetProjectDocuments"
+	WorkspacesService_GetProjectDocumentDetails_FullMethodName    = "/protos.WorkspacesService/GetProjectDocumentDetails"
+	WorkspacesService_UpdateProjectDocumentDetails_FullMethodName = "/protos.WorkspacesService/UpdateProjectDocumentDetails"
 )
 
 // WorkspacesServiceClient is the client API for WorkspacesService service.
@@ -262,6 +266,10 @@ type WorkspacesServiceClient interface {
 	GetWorkspaceMembers(ctx context.Context, in *GetWorkspaceMembersRequest, opts ...grpc.CallOption) (*GetWorkspaceMembersResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
 	GetProjectTasks(ctx context.Context, in *GetProjectTasksRequest, opts ...grpc.CallOption) (*GetProjectTasksResponse, error)
+	CreateProjectDocument(ctx context.Context, in *CreateProjectDocumentRequest, opts ...grpc.CallOption) (*CreateProjectDocumentResponse, error)
+	GetProjectDocuments(ctx context.Context, in *GetProjectDocumentsRequest, opts ...grpc.CallOption) (*GetProjectDocumentsResponse, error)
+	GetProjectDocumentDetails(ctx context.Context, in *GetProjectDocumentDetailsRequest, opts ...grpc.CallOption) (*GetProjectDocumentDetailsResponse, error)
+	UpdateProjectDocumentDetails(ctx context.Context, in *UpdateProjectDocumentDetailsRequest, opts ...grpc.CallOption) (*UpdateProjectDocumentDetailsResponse, error)
 }
 
 type workspacesServiceClient struct {
@@ -434,6 +442,42 @@ func (c *workspacesServiceClient) GetProjectTasks(ctx context.Context, in *GetPr
 	return out, nil
 }
 
+func (c *workspacesServiceClient) CreateProjectDocument(ctx context.Context, in *CreateProjectDocumentRequest, opts ...grpc.CallOption) (*CreateProjectDocumentResponse, error) {
+	out := new(CreateProjectDocumentResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_CreateProjectDocument_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetProjectDocuments(ctx context.Context, in *GetProjectDocumentsRequest, opts ...grpc.CallOption) (*GetProjectDocumentsResponse, error) {
+	out := new(GetProjectDocumentsResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetProjectDocuments_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) GetProjectDocumentDetails(ctx context.Context, in *GetProjectDocumentDetailsRequest, opts ...grpc.CallOption) (*GetProjectDocumentDetailsResponse, error) {
+	out := new(GetProjectDocumentDetailsResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_GetProjectDocumentDetails_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workspacesServiceClient) UpdateProjectDocumentDetails(ctx context.Context, in *UpdateProjectDocumentDetailsRequest, opts ...grpc.CallOption) (*UpdateProjectDocumentDetailsResponse, error) {
+	out := new(UpdateProjectDocumentDetailsResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_UpdateProjectDocumentDetails_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkspacesServiceServer is the server API for WorkspacesService service.
 // All implementations must embed UnimplementedWorkspacesServiceServer
 // for forward compatibility
@@ -456,6 +500,10 @@ type WorkspacesServiceServer interface {
 	GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error)
 	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
 	GetProjectTasks(context.Context, *GetProjectTasksRequest) (*GetProjectTasksResponse, error)
+	CreateProjectDocument(context.Context, *CreateProjectDocumentRequest) (*CreateProjectDocumentResponse, error)
+	GetProjectDocuments(context.Context, *GetProjectDocumentsRequest) (*GetProjectDocumentsResponse, error)
+	GetProjectDocumentDetails(context.Context, *GetProjectDocumentDetailsRequest) (*GetProjectDocumentDetailsResponse, error)
+	UpdateProjectDocumentDetails(context.Context, *UpdateProjectDocumentDetailsRequest) (*UpdateProjectDocumentDetailsResponse, error)
 	mustEmbedUnimplementedWorkspacesServiceServer()
 }
 
@@ -516,6 +564,18 @@ func (UnimplementedWorkspacesServiceServer) CreateTask(context.Context, *CreateT
 }
 func (UnimplementedWorkspacesServiceServer) GetProjectTasks(context.Context, *GetProjectTasksRequest) (*GetProjectTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProjectTasks not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) CreateProjectDocument(context.Context, *CreateProjectDocumentRequest) (*CreateProjectDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProjectDocument not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetProjectDocuments(context.Context, *GetProjectDocumentsRequest) (*GetProjectDocumentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProjectDocuments not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) GetProjectDocumentDetails(context.Context, *GetProjectDocumentDetailsRequest) (*GetProjectDocumentDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProjectDocumentDetails not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) UpdateProjectDocumentDetails(context.Context, *UpdateProjectDocumentDetailsRequest) (*UpdateProjectDocumentDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProjectDocumentDetails not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) mustEmbedUnimplementedWorkspacesServiceServer() {}
 
@@ -854,6 +914,78 @@ func _WorkspacesService_GetProjectTasks_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_CreateProjectDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProjectDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).CreateProjectDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_CreateProjectDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).CreateProjectDocument(ctx, req.(*CreateProjectDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetProjectDocuments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProjectDocumentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetProjectDocuments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetProjectDocuments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetProjectDocuments(ctx, req.(*GetProjectDocumentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_GetProjectDocumentDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProjectDocumentDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).GetProjectDocumentDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_GetProjectDocumentDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).GetProjectDocumentDetails(ctx, req.(*GetProjectDocumentDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkspacesService_UpdateProjectDocumentDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProjectDocumentDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).UpdateProjectDocumentDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_UpdateProjectDocumentDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).UpdateProjectDocumentDetails(ctx, req.(*UpdateProjectDocumentDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkspacesService_ServiceDesc is the grpc.ServiceDesc for WorkspacesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -932,6 +1064,22 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProjectTasks",
 			Handler:    _WorkspacesService_GetProjectTasks_Handler,
+		},
+		{
+			MethodName: "CreateProjectDocument",
+			Handler:    _WorkspacesService_CreateProjectDocument_Handler,
+		},
+		{
+			MethodName: "GetProjectDocuments",
+			Handler:    _WorkspacesService_GetProjectDocuments_Handler,
+		},
+		{
+			MethodName: "GetProjectDocumentDetails",
+			Handler:    _WorkspacesService_GetProjectDocumentDetails_Handler,
+		},
+		{
+			MethodName: "UpdateProjectDocumentDetails",
+			Handler:    _WorkspacesService_UpdateProjectDocumentDetails_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
