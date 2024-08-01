@@ -86,18 +86,22 @@ func (m *TaskModel) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*
 		}
 	}
 	var taskId int
+	var oldValue string
 	task := &pb.Task{}
-	query := fmt.Sprintf(`UPDATE tasks SET %s = '%s', updated_at = NOW() at time zone 'utc' 
+	query := fmt.Sprintf(`SELECT %s FROM tasks WHERE nanoid = '%s'`, in.ChangedField, in.Nanoid)
+	err = m.DB.QueryRow(query).Scan(&oldValue)
+	if err != nil {
+		return nil, err
+	}
+	query = fmt.Sprintf(`UPDATE tasks SET %s = '%s', updated_at = NOW() at time zone 'utc' 
 						WHERE nanoid = '%s'
 						RETURNING id, nanoid, project_id, title, description, status, label, is_published, created_at`, in.ChangedField, value, in.Nanoid)
-	log.Print(value)
-	log.Print(query)
 	err = m.DB.QueryRow(query).Scan(&taskId, &task.Nanoid, &task.ProjectId, &task.Title, &task.Description, &task.Status, &task.Label, &task.IsPublished, &task.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
 	_, err = m.DB.Exec(`INSERT INTO task_logs(task_id, created_by, changed_field, old_value, new_value) 
-			VALUES($1, $2, $3, $4, $5)`, taskId, in.UserId, in.ChangedField, "123", in.Value)
+			VALUES($1, $2, $3, $4, $5)`, taskId, in.UserId, in.ChangedField, oldValue, in.Value)
 	if err != nil {
 		return nil, err
 	}
