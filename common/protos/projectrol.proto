@@ -377,6 +377,17 @@ message UpdateProjectDocumentDetailsResponse {
     ProjectDocumentDetails details = 1;
 }
 
+message UpdateTaskRequest {
+    int32 user_id = 1;
+    string nanoid = 2;
+    string changed_field = 3;
+    string value = 4;
+}
+
+message UpdateTaskResponse {
+    Task task = 1;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -402,6 +413,7 @@ service WorkspacesService {
     rpc CreateNewRole(CreateNewRoleRequest) returns(CreateNewRoleResponse);
     rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns(GetWorkspaceMembersResponse);
     rpc CreateTask(CreateTaskRequest) returns(CreateTaskResponse);
+    rpc UpdateTask(UpdateTaskRequest) returns(UpdateTaskResponse);
     rpc GetProjectTasks(GetProjectTasksRequest) returns(GetProjectTasksResponse);
     rpc CreateProjectDocument(CreateProjectDocumentRequest) returns(CreateProjectDocumentResponse);
     rpc GetProjectDocuments(GetProjectDocumentsRequest) returns(GetProjectDocumentsResponse);

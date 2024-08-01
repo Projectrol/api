@@ -237,6 +237,7 @@ const (
 	WorkspacesService_CreateNewRole_FullMethodName                = "/protos.WorkspacesService/CreateNewRole"
 	WorkspacesService_GetWorkspaceMembers_FullMethodName          = "/protos.WorkspacesService/GetWorkspaceMembers"
 	WorkspacesService_CreateTask_FullMethodName                   = "/protos.WorkspacesService/CreateTask"
+	WorkspacesService_UpdateTask_FullMethodName                   = "/protos.WorkspacesService/UpdateTask"
 	WorkspacesService_GetProjectTasks_FullMethodName              = "/protos.WorkspacesService/GetProjectTasks"
 	WorkspacesService_CreateProjectDocument_FullMethodName        = "/protos.WorkspacesService/CreateProjectDocument"
 	WorkspacesService_GetProjectDocuments_FullMethodName          = "/protos.WorkspacesService/GetProjectDocuments"
@@ -265,6 +266,7 @@ type WorkspacesServiceClient interface {
 	CreateNewRole(ctx context.Context, in *CreateNewRoleRequest, opts ...grpc.CallOption) (*CreateNewRoleResponse, error)
 	GetWorkspaceMembers(ctx context.Context, in *GetWorkspaceMembersRequest, opts ...grpc.CallOption) (*GetWorkspaceMembersResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
+	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
 	GetProjectTasks(ctx context.Context, in *GetProjectTasksRequest, opts ...grpc.CallOption) (*GetProjectTasksResponse, error)
 	CreateProjectDocument(ctx context.Context, in *CreateProjectDocumentRequest, opts ...grpc.CallOption) (*CreateProjectDocumentResponse, error)
 	GetProjectDocuments(ctx context.Context, in *GetProjectDocumentsRequest, opts ...grpc.CallOption) (*GetProjectDocumentsResponse, error)
@@ -433,6 +435,15 @@ func (c *workspacesServiceClient) CreateTask(ctx context.Context, in *CreateTask
 	return out, nil
 }
 
+func (c *workspacesServiceClient) UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error) {
+	out := new(UpdateTaskResponse)
+	err := c.cc.Invoke(ctx, WorkspacesService_UpdateTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workspacesServiceClient) GetProjectTasks(ctx context.Context, in *GetProjectTasksRequest, opts ...grpc.CallOption) (*GetProjectTasksResponse, error) {
 	out := new(GetProjectTasksResponse)
 	err := c.cc.Invoke(ctx, WorkspacesService_GetProjectTasks_FullMethodName, in, out, opts...)
@@ -499,6 +510,7 @@ type WorkspacesServiceServer interface {
 	CreateNewRole(context.Context, *CreateNewRoleRequest) (*CreateNewRoleResponse, error)
 	GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error)
 	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
+	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
 	GetProjectTasks(context.Context, *GetProjectTasksRequest) (*GetProjectTasksResponse, error)
 	CreateProjectDocument(context.Context, *CreateProjectDocumentRequest) (*CreateProjectDocumentResponse, error)
 	GetProjectDocuments(context.Context, *GetProjectDocumentsRequest) (*GetProjectDocumentsResponse, error)
@@ -561,6 +573,9 @@ func (UnimplementedWorkspacesServiceServer) GetWorkspaceMembers(context.Context,
 }
 func (UnimplementedWorkspacesServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
+}
+func (UnimplementedWorkspacesServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
 }
 func (UnimplementedWorkspacesServiceServer) GetProjectTasks(context.Context, *GetProjectTasksRequest) (*GetProjectTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProjectTasks not implemented")
@@ -896,6 +911,24 @@ func _WorkspacesService_CreateTask_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkspacesService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkspacesServiceServer).UpdateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkspacesService_UpdateTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkspacesServiceServer).UpdateTask(ctx, req.(*UpdateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkspacesService_GetProjectTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetProjectTasksRequest)
 	if err := dec(in); err != nil {
@@ -1060,6 +1093,10 @@ var WorkspacesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTask",
 			Handler:    _WorkspacesService_CreateTask_Handler,
+		},
+		{
+			MethodName: "UpdateTask",
+			Handler:    _WorkspacesService_UpdateTask_Handler,
 		},
 		{
 			MethodName: "GetProjectTasks",

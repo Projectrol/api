@@ -771,3 +771,41 @@ func (app *application) UpdateProjectDocumentDetailsHandler(w http.ResponseWrite
 
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response.Details})
 }
+
+func (app *application) UpdateProjectTaskHandler(w http.ResponseWriter, r *http.Request) {
+	nanoid := httprouter.ParamsFromContext(r.Context()).ByName("nanoid")
+	userId := r.Context().Value(common.ContextUserIdKey).(int)
+
+	input := &wsModels.UpdateTaskInput{}
+	err := common.ReadJSON(r, input)
+
+	if err != nil {
+		log.Print(err)
+		common.WriteJSON(w, http.StatusBadRequest, common.Envelop{"error": "invalid body format"})
+		return
+	}
+
+	request := &pb.UpdateTaskRequest{
+		Nanoid:       nanoid,
+		UserId:       int32(userId),
+		ChangedField: input.ChangedField,
+		Value:        input.Value,
+	}
+
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+
+	client := pb.NewWorkspacesServiceClient(conn)
+	response, err := client.UpdateTask(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"task": response.Task})
+}
