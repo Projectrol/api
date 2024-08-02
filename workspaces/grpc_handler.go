@@ -114,3 +114,7 @@ func (s *server) UpdateProjectDocumentDetails(ctx context.Context, in *pb.Update
 func (s *server) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {
 	return s.TaskModel.UpdateTask(ctx, in)
 }
+
+func (s *server) GetProjectTaskDetails(ctx context.Context, in *pb.GetProjectTaskDetailsRequest) (*pb.GetProjectTaskDetailsResponse, error) {
+	return s.TaskModel.GetProjectTaskDetails(ctx, in)
+}

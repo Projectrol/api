@@ -294,6 +294,7 @@ message Task {
     string label = 6;
     bool is_published = 7;    
     string created_at = 8;
+    int32 created_by = 9;
 }
 
 message CreateTaskRequest {
@@ -388,6 +389,23 @@ message UpdateTaskResponse {
     Task task = 1;
 }
 
+message GetProjectTaskDetailsRequest {
+    string nanoid = 1;
+}
+
+message TaskLog {
+    int32 created_by = 1;
+    string changed_field = 2;
+    string old_value = 3;
+    string new_value = 4;
+    string created_at = 5;
+}
+
+message GetProjectTaskDetailsResponse {
+    Task task = 1;
+    repeated TaskLog task_logs = 2;
+}
+
 service UsersService {
     rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(User);
@@ -419,6 +437,7 @@ service WorkspacesService {
     rpc GetProjectDocuments(GetProjectDocumentsRequest) returns(GetProjectDocumentsResponse);
     rpc GetProjectDocumentDetails(GetProjectDocumentDetailsRequest) returns(GetProjectDocumentDetailsResponse);
     rpc UpdateProjectDocumentDetails(UpdateProjectDocumentDetailsRequest) returns(UpdateProjectDocumentDetailsResponse);
+    rpc GetProjectTaskDetails(GetProjectTaskDetailsRequest) returns(GetProjectTaskDetailsResponse);
 }
 
 service NotificationsService {  

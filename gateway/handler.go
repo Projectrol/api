@@ -809,3 +809,28 @@ func (app *application) UpdateProjectTaskHandler(w http.ResponseWriter, r *http.
 
 	common.WriteJSON(w, http.StatusOK, common.Envelop{"task": response.Task})
 }
+
+func (app *application) GetProjectTaskDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	nanoid := httprouter.ParamsFromContext(r.Context()).ByName("nanoid")
+
+	conn, err := grpc.NewClient("localhost:3001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		errMsg := common.Envelop{"error": "Cannot connect to workspaces gRPC server. Error: " + err.Error()}
+		common.WriteJSON(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+
+	request := &pb.GetProjectTaskDetailsRequest{
+		Nanoid: nanoid,
+	}
+
+	client := pb.NewWorkspacesServiceClient(conn)
+	response, err := client.GetProjectTaskDetails(context.Background(), request)
+	if err != nil {
+		errMsg := common.Envelop{"error": err.Error()}
+		common.WriteJSON(w, http.StatusBadRequest, errMsg)
+		return
+	}
+
+	common.WriteJSON(w, http.StatusOK, common.Envelop{"details": response})
+}

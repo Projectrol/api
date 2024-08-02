@@ -57,7 +57,7 @@ func (m *TaskModel) GetProjectTasks(ctx context.Context, in *pb.GetProjectTasksR
 		return nil, err
 	}
 
-	rows, err := m.DB.Query(`SELECT nanoid, project_id, title, description, status, label, is_published, created_at 
+	rows, err := m.DB.Query(`SELECT nanoid, project_id, title, description, status, label, is_published, created_at, created_by
 							FROM tasks WHERE project_id = $1 AND is_published = true`, projectId)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (m *TaskModel) GetProjectTasks(ctx context.Context, in *pb.GetProjectTasksR
 	for rows.Next() {
 		task := &pb.Task{}
 		err = rows.Scan(&task.Nanoid, &task.ProjectId, &task.Title, &task.Description,
-			&task.Status, &task.Label, &task.IsPublished, &task.CreatedAt)
+			&task.Status, &task.Label, &task.IsPublished, &task.CreatedAt, &task.CreatedBy)
 		if err == nil {
 			tasks = append(tasks, task)
 		} else {
@@ -95,8 +95,8 @@ func (m *TaskModel) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*
 	}
 	query = fmt.Sprintf(`UPDATE tasks SET %s = '%s', updated_at = NOW() at time zone 'utc' 
 						WHERE nanoid = '%s'
-						RETURNING id, nanoid, project_id, title, description, status, label, is_published, created_at`, in.ChangedField, value, in.Nanoid)
-	err = m.DB.QueryRow(query).Scan(&taskId, &task.Nanoid, &task.ProjectId, &task.Title, &task.Description, &task.Status, &task.Label, &task.IsPublished, &task.CreatedAt)
+						RETURNING id, nanoid, project_id, title, description, status, label, is_published, created_at, created_by`, in.ChangedField, value, in.Nanoid)
+	err = m.DB.QueryRow(query).Scan(&taskId, &task.Nanoid, &task.ProjectId, &task.Title, &task.Description, &task.Status, &task.Label, &task.IsPublished, &task.CreatedAt, &task.CreatedBy)
 	if err != nil {
 		return nil, err
 	}
@@ -106,4 +106,28 @@ func (m *TaskModel) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*
 		return nil, err
 	}
 	return &pb.UpdateTaskResponse{Task: task}, nil
+}
+
+func (m *TaskModel) GetProjectTaskDetails(ctx context.Context, in *pb.GetProjectTaskDetailsRequest) (*pb.GetProjectTaskDetailsResponse, error) {
+	task := &pb.Task{}
+	var taskId int
+	err := m.DB.QueryRow(`SELECT id, nanoid, project_id, title, description, status, label, is_published, created_at, created_by 
+	FROM tasks WHERE nanoid = $1 AND is_published = true`, in.Nanoid).
+		Scan(&taskId, &task.Nanoid, &task.ProjectId, &task.Title, &task.Description,
+			&task.Status, &task.Label, &task.IsPublished, &task.CreatedAt, &task.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := m.DB.Query(`SELECT created_by, changed_field, old_value, new_value, created_at FROM task_logs WHERE task_id = $1 ORDER BY created_at DESC`, taskId)
+	var taskLogs []*pb.TaskLog
+	if err == nil {
+		for rows.Next() {
+			taskLog := &pb.TaskLog{}
+			err = rows.Scan(&taskLog.CreatedBy, &taskLog.ChangedField, &taskLog.OldValue, &taskLog.NewValue, &taskLog.CreatedAt)
+			if err == nil {
+				taskLogs = append(taskLogs, taskLog)
+			}
+		}
+	}
+	return &pb.GetProjectTaskDetailsResponse{Task: task, TaskLogs: taskLogs}, nil
 }
