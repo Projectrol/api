@@ -287,9 +287,17 @@ func (app *application) GetProjectsByWorkspaceIdHandler(w http.ResponseWriter, r
 	}
 	client := pb.NewWorkspacesServiceClient(conn)
 	userId := r.Context().Value(common.ContextUserIdKey).(int)
+
 	request := &pb.GetProjectsByWorkspaceIdRequest{
 		WorkspaceId: int32(workspaceId),
 		UserId:      int32(userId),
+	}
+
+	q := params.ByName("q")
+	if q != "" {
+		request.Q = q
+	} else {
+		request.Q = "*"
 	}
 
 	ctx := context.Background()

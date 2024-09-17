@@ -83,7 +83,9 @@ func (app *application) AuthorizeGuard(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		c := pb.NewWorkspacesServiceClient(conn)
-
+		if resourceTag == "search-projects" {
+			resourceTag = "projects"
+		}
 		if resourceTag == "projects" || resourceTag == "documents" {
 			if resourceTag == "documents" {
 				resourceTag = "projects"
